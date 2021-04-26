@@ -6,6 +6,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 import COLORS from './src/const/colors';
 import OnBoardScreen from './src/views/screens/OnBoardScreen';
 import BottomNavigator from './src/views/navigation/BottomNavigation';
+LogBox.ignoreLogs(['Warning: ...']);
+LogBox.ignoreAllLogs();
 
 const Stack = createStackNavigator();
 const App = () => {

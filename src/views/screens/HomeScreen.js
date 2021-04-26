@@ -5,12 +5,16 @@ import {
   View,
   StyleSheet,
   Alert,
+  ScrollView,
   SafeAreaView,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import FIREBASE from '../../config/FIREBASE';
 import {CardContact} from '../../maincomponents';
 import COLORS from '../../const/colors';
+import {LogBox} from 'react-native';
+LogBox.ignoreLogs(['Warning: ...']);
+LogBox.ignoreAllLogs();
 
 export default class Home extends Component {
   constructor(props) {
@@ -42,29 +46,31 @@ export default class Home extends Component {
   render() {
     const {contact, contactKey} = this.state;
     return (
-      <SafeAreaView style={styles.conatiner}>
-        <View style={styles.mainheader}>
-          <Text style={styles.headertitle}>Menu</Text>
-        </View>
-
-        <View style={styles.page}>
-          <View style={styles.listContact}>
-            {contactKey.length > 0 ? (
-              contactKey.map(key => (
-                <CardContact
-                  key={key}
-                  contactItem={contact[key]}
-                  id={key}
-                  {...this.props}
-                  removeData={this.removeData}
-                />
-              ))
-            ) : (
-              <Text> loading...</Text>
-            )}
+      <View style={styles.conatiner}>
+        
+          <View style={styles.mainheader}>
+            <Text style={styles.headertitle}>Menu</Text>
           </View>
-        </View>
-      </SafeAreaView>
+          <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.page}>
+            <View style={styles.listContact}>
+              {contactKey.length > 0 ? (
+                contactKey.map(key => (
+                  <CardContact
+                    key={key}
+                    contactItem={contact[key]}
+                    id={key}
+                    {...this.props}
+                    removeData={this.removeData}
+                  />
+                ))
+              ) : (
+                <Text> loading...</Text>
+              )}
+            </View>
+          </View>
+        </ScrollView>
+      </View>
     );
   }
 }
