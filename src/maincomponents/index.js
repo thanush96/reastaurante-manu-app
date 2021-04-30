@@ -1,3 +1,4 @@
 import CardContact from './CartContact';
+import InputBox from './InputBox';
 
-export {CardContact};
+export {CardContact, InputBox};

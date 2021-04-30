@@ -41,29 +41,35 @@ export default class Home extends Component {
           contact: contactItem,
           contactKey: Object.keys(contactItem),
         });
+
+        this.state.contactKey.map(key =>
+          console.log(this.state.contact[key].MenuFoodStatus),
+        );
       });
   }
   render() {
     const {contact, contactKey} = this.state;
+    // console.log(contact)
     return (
       <View style={styles.conatiner}>
-        
-          <View style={styles.mainheader}>
-            <Text style={styles.headertitle}>Menu</Text>
-          </View>
-          <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.mainheader}>
+          <Text style={styles.headertitle}>Menu</Text>
+        </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.page}>
             <View style={styles.listContact}>
               {contactKey.length > 0 ? (
-                contactKey.map(key => (
-                  <CardContact
-                    key={key}
-                    contactItem={contact[key]}
-                    id={key}
-                    {...this.props}
-                    removeData={this.removeData}
-                  />
-                ))
+                contactKey.map(key =>
+                  contact[key].MenuFoodStatus == 'Active' ? (
+                    <CardContact
+                      key={key}
+                      contactItem={contact[key]}
+                      id={key}
+                      {...this.props}
+                      removeData={this.removeData}
+                    />
+                  ) : null,
+                )
               ) : (
                 <Text> loading...</Text>
               )}
