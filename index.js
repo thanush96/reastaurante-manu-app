@@ -4,7 +4,7 @@
 
 import {AppRegistry} from 'react-native';
 import App from './App';
-// import App from './src/views/screens/BulkOrder';
+// import App from './src/views/components/otp/VerifyCode';
 import {name as appName} from './app.json';
 
 import {YellowBox} from 'react-native';

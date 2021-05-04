@@ -7,10 +7,12 @@ import {
   Alert,
   ScrollView,
   SafeAreaView,
+  RefreshControl,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import FIREBASE from '../../config/FIREBASE';
 import {CardContact} from '../../maincomponents';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import COLORS from '../../const/colors';
 import {LogBox} from 'react-native';
 LogBox.ignoreLogs(['Warning: ...']);
@@ -23,11 +25,13 @@ export default class Home extends Component {
     this.state = {
       contact: {},
       contactKey: [],
+      refreshing: false,
     };
   }
 
   componentDidMount() {
     this.MountData();
+    console.log('Load And Refreshing');
   }
 
   MountData() {
@@ -40,6 +44,7 @@ export default class Home extends Component {
         this.setState({
           contact: contactItem,
           contactKey: Object.keys(contactItem),
+          refreshing: false,
         });
 
         this.state.contactKey.map(key =>
@@ -47,33 +52,46 @@ export default class Home extends Component {
         );
       });
   }
+
+  _onRefresh = () => {
+    this.setState({refreshing: true});
+    this.componentDidMount();
+  };
+
   render() {
     const {contact, contactKey} = this.state;
-    // console.log(contact)
     return (
       <View style={styles.conatiner}>
         <View style={styles.mainheader}>
-          <Text style={styles.headertitle}>Menu</Text>
+          <Text style={styles.headertitle}>
+            <Icon name="home-filled" size={26} />
+            Menu
+          </Text>
         </View>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this._onRefresh}
+            />
+          }>
           <View style={styles.page}>
-            <View style={styles.listContact}>
-              {contactKey.length > 0 ? (
-                contactKey.map(key =>
-                  contact[key].MenuFoodStatus == 'Active' ? (
-                    <CardContact
-                      key={key}
-                      contactItem={contact[key]}
-                      id={key}
-                      {...this.props}
-                      removeData={this.removeData}
-                    />
-                  ) : null,
-                )
-              ) : (
-                <Text> loading...</Text>
-              )}
-            </View>
+            {contactKey.length > 0 ? (
+              contactKey.map(key =>
+                contact[key].MenuFoodStatus == 'Active' ? (
+                  <CardContact
+                    key={key}
+                    contactItem={contact[key]}
+                    id={key}
+                    {...this.props}
+                    removeData={this.removeData}
+                  />
+                ) : null,
+              )
+            ) : (
+              <Text> loading...</Text>
+            )}
           </View>
         </ScrollView>
       </View>
@@ -95,10 +113,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: COLORS.white,
     top: 50,
+
   },
 
   page: {
     flex: 1,
+    paddingHorizontal: 30,
+    marginTop: 15,
   },
 
   header: {
@@ -114,11 +135,6 @@ const styles = StyleSheet.create({
   grid: {
     borderWidth: 1,
     marginTop: 10,
-  },
-
-  listContact: {
-    paddingHorizontal: 30,
-    marginTop: 20,
   },
   wrapperButton: {
     flex: 1,

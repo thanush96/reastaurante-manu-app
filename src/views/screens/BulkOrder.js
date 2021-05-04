@@ -3,13 +3,14 @@ import {Picker} from '@react-native-picker/picker';
 import React, {Component} from 'react';
 import {
   TouchableOpacity,
-  Button,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
+  Alert,
   View,
   Platform,
+  RefreshControl,
 } from 'react-native';
 import COLORS from '../../const/colors';
 import InputData from '../../maincomponents/InputBox';
@@ -29,6 +30,7 @@ export default class BulkOrder extends Component {
       dataSource: [],
       selectedHours: 0,
       selectedMinutes: 0,
+      // refreshing: false,
     };
   }
 
@@ -49,6 +51,7 @@ export default class BulkOrder extends Component {
           var childData = childSnapshot.val();
           items.push(childData);
         });
+
         return items;
       });
   }
@@ -56,8 +59,10 @@ export default class BulkOrder extends Component {
   async componentWillMount() {
     this.setState({
       dataSource: await this.get_firebase_list(),
+      // refreshing: false,
     });
     // console.log(this.state.dataSource);
+    // console.log('Refreshing..');
   }
 
   onSubmit = () => {
@@ -79,8 +84,8 @@ export default class BulkOrder extends Component {
       };
       AddBulkOrders.push(BulkOrders)
         .then(data => {
-          console.log('Added');
-          // Alert.alert('Success', 'added');
+          // console.log('Added');
+          Alert.alert('Success', 'Order Success');
           this.setState({
             name: '',
             contact: '',
@@ -97,9 +102,25 @@ export default class BulkOrder extends Component {
     }
   };
 
+  // _onRefresh = () => {
+  //   this.setState({refreshing: true});
+  //   this.componentWillMount();
+  // };
+
+  clear = () => {
+    this.setState({
+      name: '',
+      contact: '',
+      foodItem: '',
+      parcels: '',
+      date: '',
+    });
+  };
+
   render() {
     var today = new Date();
     today.setDate(today.getDate() + 3);
+
     return (
       <SafeAreaView style={styles.conatiner}>
         <View style={styles.header}>
@@ -107,32 +128,47 @@ export default class BulkOrder extends Component {
         </View>
 
         <View style={styles.pages}>
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            // refreshControl={
+            //   <RefreshControl
+            //     refreshing={this.state.refreshing}
+            //     onRefresh={this._onRefresh}
+            //   />
+            // }
+          >
             <Text style={{fontSize: 16, marginBottom: 5}}>
-              Choose Your Foods
+              Food Name
             </Text>
 
-            <Picker
-              onValueChange={(itemVlue, itemIndex) =>
-                this.setState({
-                  foodItem: itemVlue,
-                })
-              }>
-              {this.state.dataSource.map((item, index) => {
-                {/* console.log(item.FoodStatus); */}
-                if(item.BulkFoodStatus === 'Active')
-                return (
-                  <Picker.Item
-                    label={item.name}
-                    value={item.name}
-                    key={index}
-                  />
-                );
-              })}
-            </Picker>
+            <View style={styles.card}>
+              <Picker
+                onValueChange={(itemVlue, itemIndex) =>
+                  this.setState({
+                    foodItem: itemVlue,
+                  })
+                }>
+                <Picker.Item label="--Select Food--" value="default" style={{color:'#D3D3D3'}} />
+                {this.state.dataSource.map((item, index) => {
+                  {
+                    /* console.log(item.FoodStatus); */
+                  }
+                  if (item.BulkFoodStatus === 'Active')
+                    return (
+                      <Picker.Item
+                        color="black"
+                        label={item.name}
+                        value={item.name}
+                        key={index}
+                      />
+                    );
+                })}
+              </Picker>
+            </View>
 
             <InputData
-              label="Number of Parcels"
+              label="Parcels"
               placeholder="Number Of Parcels"
               onChangeText={this.onChangeText}
               value={this.state.parcels}
@@ -206,6 +242,13 @@ export default class BulkOrder extends Component {
               onPress={() => this.onSubmit()}>
               <Text style={styles.submit}>Order Now</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.touch}
+              onPress={() => this.clear()}
+              keyboardShouldPersistTaps={'always'}>
+              <Text style={styles.submit}>Clear</Text>
+            </TouchableOpacity>
           </ScrollView>
         </View>
       </SafeAreaView>
@@ -224,6 +267,7 @@ const styles = StyleSheet.create({
   pages: {
     flex: 1,
     padding: 30,
+    // backgroundColor:'green'
   },
   title: {
     fontSize: 30,
@@ -233,11 +277,20 @@ const styles = StyleSheet.create({
     top: 50,
   },
 
+  card: {
+    borderWidth: 1,
+    borderColor: 'grey',
+    color: 'black',
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+
   touch: {
-    backgroundColor: 'black',
+    backgroundColor: COLORS.secondary,
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
+    borderRadius: 50,
   },
   submit: {
     color: 'white',

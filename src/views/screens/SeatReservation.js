@@ -40,11 +40,19 @@ import Authenticated from '../components/otp/Authenticated';
 export default function App() {
   const [confirm, setConfirm] = useState(null);
   const [authenticated, setAuthenticated] = useState(false);
+  const [seat, setSeat] = useState(null);
+  const [mobile, setMobile] = useState(null);
+  const [isDate, setDate] = useState(null);
 
-  async function signIn(phoneNumber) {
+  async function signIn(phoneNumber, seats, isDate) {
+    console.log('signIn');
+    setMobile(phoneNumber);
+    setSeat(seats);
+    setDate(isDate);
     try {
       const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-      console.log(phoneNumber);
+      console.log(phoneNumber, seats);
+
       setConfirm(confirmation);
     } catch (error) {
       alert(error);
@@ -53,9 +61,11 @@ export default function App() {
   }
 
   async function confirmVerificationCode(code) {
+    console.log('confirmVerificationCode');
     try {
       await confirm.confirm(code);
-      console.log(code);
+      // console.log(code);
+      console.log(seat, mobile, code, isDate, new Date().toDateString());
       setConfirm(null);
     } catch (error) {
       alert('Invalid code');

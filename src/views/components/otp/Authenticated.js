@@ -1,13 +1,13 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import {StyleSheet, Text, View, Button} from 'react-native';
 import auth from '@react-native-firebase/auth';
 
 export default function Authenticated() {
+  console.log('Current user : ', auth().currentUser.phoneNumber);
   return (
     <View style={styles.screen}>
-      <Text style={styles.text}>You're Logged in</Text>
       <Text style={styles.phoneNumber}>{auth().currentUser.phoneNumber}</Text>
-      <View style={{ marginTop: 30 }}>
+      <View style={{marginTop: 30}}>
         <Button title="Signout" onPress={() => auth().signOut()} />
       </View>
     </View>

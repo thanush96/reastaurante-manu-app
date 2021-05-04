@@ -15,15 +15,17 @@ const BottomNavigator = () => {
     <Tab.Navigator
       tabBarOptions={{
         style: {
-          borderTopLeftRadius: 15,
-          borderTopRightRadius: 15,
+          borderTopLeftRadius:15,
+          borderTopRightRadius:15,
           height: 50,
           borderTopWidth: 0,
+          // marginHorizontal:40,
+          // marginBottom:10,
           elevation: 0,
           backgroundColor: COLORS.secondary,
         },
-        showLabel: true,
-        activeTintColor: COLORS.primary,
+        showLabel: false,
+        activeTintColor: COLORS.white,
       }}>
       <Tab.Screen
         name="Home"

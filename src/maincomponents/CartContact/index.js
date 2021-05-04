@@ -4,32 +4,33 @@ import {faEdit, faTimes} from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import COLORS from '../../const/colors';
 
 const CardContact = ({id, contactItem, navigation, removeData}) => {
   return (
-    <TouchableOpacity
     // onPress={() => {
     //   navigation.navigate('ContactDetails', {id: id});
     // }}
-    >
-      <LinearGradient
-        colors={['#614385', '#516395']}
-        style={styles.linearGradient}>
-        <View>
-          <Text style={styles.name}>{contactItem.name}</Text>
-          <Text style={styles.age}>{contactItem.age}</Text>
-          <Text style={styles.age}>{contactItem.address}</Text>
-        </View>
-        <View style={styles.imgBody}>
-          <Image
-            style={styles.img}
-            source={{
-              uri: contactItem.imgUrl,
-            }}
-          />
-          {/* <Text style={styles.address}>{contactItem.address}</Text> */}
-        </View>
-        {/* <View style={styles.icon}>
+
+    <LinearGradient
+      colors={['#CABAA5', '#CABAA5']}
+      style={styles.linearGradient}>
+      <View style={styles.imgBody}>
+        <Image
+          style={styles.img}
+          source={{
+            uri: contactItem.imgUrl,
+          }}
+        />
+        {/* <Text style={styles.address}>{contactItem.address}</Text> */}
+      </View>
+      <View style={styles.TextBody}>
+        <Text style={styles.name}>{contactItem.name}</Text>
+        <Text style={styles.age}>Rs {contactItem.age}.00</Text>
+        <Text style={styles.address}>{contactItem.address}</Text>
+      </View>
+
+      {/* <View style={styles.icon}>
         <FontAwesomeIcon
           icon={faEdit}
           color={'orange'}
@@ -47,8 +48,7 @@ const CardContact = ({id, contactItem, navigation, removeData}) => {
           }}
         />
       </View> */}
-      </LinearGradient>
-    </TouchableOpacity>
+    </LinearGradient>
   );
 };
 
@@ -58,32 +58,46 @@ const styles = StyleSheet.create({
   linearGradient: {
     flex: 1,
     flexDirection: 'row',
-    padding: 15,
-    borderRadius: 10,
+    // padding: 15,
+    // borderRadius: 15,
     marginBottom: 15,
     shadowOpacity: 0.25,
     shadowRadius: 3.85,
+    borderTopLeftRadius: 50,
+    borderBottomLeftRadius: 50,
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
   },
-  name: {fontWeight: 'bold', fontSize: 16, color: 'white'},
+  name: {fontWeight: 'bold', fontSize: 30, color: COLORS.secondary},
   age: {
-    fontSize: 12,
+    fontSize: 18,
     color: 'white',
   },
   address: {
     fontSize: 12,
-    color: 'white',
+    color: 'black',
   },
 
   img: {
     width: 100,
     height: 100,
-    borderRadius: 5,
+    borderRadius: 50,
+    borderColor:'white',
   },
 
   imgBody: {
     flexDirection: 'row',
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     alignItems: 'center',
+    // backgroundColor:'green'
+  },
+
+  TextBody: {
+    flex: 2,
+    marginHorizontal: 50,
+    justifyContent: 'center',
+    // alignItems: 'center',
+    // backgroundColor:'red'
   },
 });
