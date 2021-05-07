@@ -1,5 +1,12 @@
-import React, { useState } from 'react';
-import { StyleSheet,SafeAreaView, Text, View, Button, TextInput } from 'react-native';
+import React, {useState} from 'react';
+import {
+  StyleSheet,
+  SafeAreaView,
+  Text,
+  View,
+  Button,
+  TextInput,
+} from 'react-native';
 import COLORS from '../../../const/colors';
 
 export default function OTP(props) {
@@ -7,20 +14,20 @@ export default function OTP(props) {
 
   return (
     <SafeAreaView style={styles.conatiner}>
-    <View style={styles.header}>
-      <Text style={styles.title}>Verify Your Code</Text>
-    </View>
-    <View style={styles.screen}>
-      <Text style={styles.text}>Enter OTP</Text>
-      <TextInput
-        autoFocus
-        value={code}
-        onChangeText={setCode}
-        keyboardType="numeric"
-        style={styles.input}
-      />
-      <Button title="Confirm OTP" onPress={() => props.onSubmit(code)} />
-    </View>
+      <View style={styles.header}>
+        <Text style={styles.title}>Verify Your Code</Text>
+      </View>
+      <View style={styles.screen}>
+        <Text style={styles.text}>Enter OTP</Text>
+        <TextInput
+          autoFocus
+          value={code}
+          onChangeText={setCode}
+          keyboardType="numeric"
+          style={styles.input}
+        />
+        <Button title="Confirm OTP" onPress={() => props.onSubmit(code)} />
+      </View>
     </SafeAreaView>
   );
 }
@@ -51,6 +58,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   input: {
+    color: 'black',
     borderWidth: 2,
     borderColor: 'lightblue',
     width: 300,

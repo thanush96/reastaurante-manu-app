@@ -6,14 +6,16 @@ import {
   View,
   Button,
   TextInput,
+  TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import DatePicker from 'react-native-datepicker';
 import COLORS from '../../../const/colors';
-
+import PhoneInput from 'react-native-phone-input';
 
 export default function PhoneNumber(props) {
-  // const [name, setName] = useState(null);
+  const [name, setName] = useState(null);
   const [seats, setSeats] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState(null);
   const [isDate, setDate] = useState(null);
@@ -35,22 +37,25 @@ export default function PhoneNumber(props) {
     hideDatePicker();
   };
 
+  const onPhoneInputChange = value => {
+    console.log('Phone');
+    setPhoneNumber(value);
+  };
+
   var today = new Date();
-
   return (
-    <SafeAreaView style={styles.conatiner}>
+    <SafeAreaView style={styles.conatiner} keyboardShouldPersistTaps="handled">
       <View style={styles.header}>
-        <Text style={styles.title}>Bulk Order</Text>
+        <Text style={styles.title}>Seat Reservation</Text>
       </View>
+      <ScrollView>
       <View style={styles.screen}>
-        {/* <Text style={styles.text}>Enter Your Name</Text>
-      <TextInput
-        autoFocus
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
-      />
+        <Text style={styles.text}>Enter Your Name</Text>
+        <TextInput style={styles.input} value={name} onChangeText={setName} />
 
+        <Text style={styles.text}>Seats</Text>
+        <TextInput style={styles.input} value={seats} onChangeText={setSeats} />
+        {/*
       <Text style={styles.text}>Booking Date</Text>
       <TextInput
         autoFocus
@@ -77,44 +82,58 @@ export default function PhoneNumber(props) {
           maxDate="01-01-2051"
           confirmBtnText="Confirm"
           cancelBtnText="Cancel"
-          // customStyles={{
-          // dateIcon: {
-          //   // display: 'none',
-          //   position: 'absolute',
-          //   left: 0,
-          //   top: 4,
-          //   marginLeft: 0,
-          // },
-          //   dateInput: {
-          //     marginLeft: 36,
-          //     borderRadius: 5,
-          //   },
-          // }}
+          customStyles={{
+            dateIcon: {
+              // display: 'none',
+              position: 'absolute',
+              left: 0,
+              top: 4,
+              marginLeft: 0,
+            },
+            dateInput: {
+              marginLeft: 0,
+              borderRadius: 5,
+            },
+          }}
           onDateChange={date => {
             setDate(date);
             // console.log(new Date().toDateString());
           }}
         />
-        <Text style={styles.text}>Seats</Text>
-        <TextInput
-          autoFocus
-          style={styles.input}
-          value={seats}
-          onChangeText={setSeats}
-        />
 
         <Text style={styles.text}>Enter Phone Number</Text>
-        <TextInput
-          autoFocus
+        {/* <TextInput
           style={styles.input}
           value={phoneNumber}
+          keyboardType="number-pad"
           onChangeText={setPhoneNumber}
+        /> */}
+
+        {/* <PhoneInput ref="phone" /> */}
+        <PhoneInput
+          style={styles.phoneInput}
+          value={phoneNumber}
+          keyboardType="number-pad"
+          onChangePhoneNumber={setPhoneNumber}
+          initialCountry={'us'}
+         
         />
-        <Button
-          title="Phone Number Sign In"
-          onPress={() => props.onSubmit(phoneNumber, seats, isDate)}
-        />
+
+        <TouchableOpacity
+          style={styles.touch}
+          onPress={() => props.onSubmit(name, phoneNumber, seats, isDate)}
+          keyboardShouldPersistTaps={'always'}>
+          <Text style={styles.submit}>Book now</Text>
+        </TouchableOpacity>
+
+        {/* <TouchableOpacity
+          style={styles.touch}
+          onPressIn={reset()}
+          keyboardShouldPersistTaps={'always'}>
+          <Text style={styles.submit}>Clear</Text>
+        </TouchableOpacity> */}
       </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -140,14 +159,25 @@ const styles = StyleSheet.create({
     top: 50,
   },
   screen: {
-    flex: 1,
+    backgroundColor: 'green',
+
+    marginTop: 20,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
   },
   input: {
-    color: 'black',
     borderWidth: 1,
+    borderColor: 'lightblue',
+    width: 300,
+    marginVertical: 10,
+    fontSize: 18,
+    padding: 10,
+    borderRadius: 8,
+  },
+  phoneInput: {
+    borderWidth: 1,
+    backgroundColor: 'grey',
     borderColor: 'lightblue',
     width: 300,
     marginVertical: 10,
@@ -161,5 +191,20 @@ const styles = StyleSheet.create({
   datePickerStyle: {
     width: 300,
     marginTop: 10,
+  },
+
+  touch: {
+    backgroundColor: COLORS.secondary,
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    borderRadius: 50,
+  },
+  submit: {
+    width: 280,
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 16,
   },
 });

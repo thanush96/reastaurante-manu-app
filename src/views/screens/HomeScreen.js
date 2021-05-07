@@ -75,11 +75,13 @@ export default class Home extends Component {
               refreshing={this.state.refreshing}
               onRefresh={this._onRefresh}
             />
-          }>
+          }
+
+          >
           <View style={styles.page}>
             {contactKey.length > 0 ? (
               contactKey.map(key =>
-                contact[key].MenuFoodStatus == 'Active' ? (
+                contact[key].MenuFoodStatus == true ? (
                   <CardContact
                     key={key}
                     contactItem={contact[key]}
@@ -113,7 +115,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: COLORS.white,
     top: 50,
-
   },
 
   page: {
@@ -158,3 +159,5 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 });
+
+

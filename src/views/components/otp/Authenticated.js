@@ -3,12 +3,12 @@ import {StyleSheet, Text, View, Button} from 'react-native';
 import auth from '@react-native-firebase/auth';
 
 export default function Authenticated() {
-  console.log('Current user : ', auth().currentUser.phoneNumber);
   return (
     <View style={styles.screen}>
-      <Text style={styles.phoneNumber}>{auth().currentUser.phoneNumber}</Text>
+      {/* <Text style={styles.phoneNumber}>{auth().currentUser.phoneNumber}</Text> */}
+      <Text>Successsfull Your Reservation</Text>
       <View style={{marginTop: 30}}>
-        <Button title="Signout" onPress={() => auth().signOut()} />
+        <Button title="Back To Home" onPress={() => auth().signOut()} />
       </View>
     </View>
   );

@@ -16,6 +16,7 @@ import COLORS from '../../const/colors';
 import InputData from '../../maincomponents/InputBox';
 import FIREBASE from '../../config/FIREBASE';
 import DatePicker from 'react-native-datepicker';
+import WarningMessage from '../components/Alert/warningMessage';
 
 export default class BulkOrder extends Component {
   constructor(props) {
@@ -30,6 +31,7 @@ export default class BulkOrder extends Component {
       dataSource: [],
       selectedHours: 0,
       selectedMinutes: 0,
+      showAlert: false,
       // refreshing: false,
     };
   }
@@ -98,7 +100,8 @@ export default class BulkOrder extends Component {
           console.log('Error :', error);
         });
     } else {
-      Alert.alert('Error', 'Please Input here');
+      this.showAlert();
+      // Alert.alert('Error', 'Please Input here');
     }
   };
 
@@ -115,11 +118,27 @@ export default class BulkOrder extends Component {
       parcels: '',
       date: '',
     });
+    this.componentWillMount();
+  };
+
+  // ALERT FUNCTIONS
+  showAlert = () => {
+    this.setState({
+      showAlert: true,
+    });
+  };
+
+  hideAlert = () => {
+    console.log('hide');
+    this.setState({
+      showAlert: false,
+    });
   };
 
   render() {
     var today = new Date();
     today.setDate(today.getDate() + 3);
+    const {showAlert} = this.state;
 
     return (
       <SafeAreaView style={styles.conatiner}>
@@ -138,9 +157,7 @@ export default class BulkOrder extends Component {
             //   />
             // }
           >
-            <Text style={{fontSize: 16, marginBottom: 5}}>
-              Food Name
-            </Text>
+            <Text style={{fontSize: 16, marginBottom: 5}}>Food Name</Text>
 
             <View style={styles.card}>
               <Picker
@@ -149,12 +166,16 @@ export default class BulkOrder extends Component {
                     foodItem: itemVlue,
                   })
                 }>
-                <Picker.Item label="--Select Food--" value="default" style={{color:'#D3D3D3'}} />
+                {/* <Picker.Item
+                  label="--Select Food--"
+                  value="default"
+                  style={{color: '#D3D3D3'}}
+                /> */}
                 {this.state.dataSource.map((item, index) => {
                   {
                     /* console.log(item.FoodStatus); */
                   }
-                  if (item.BulkFoodStatus === 'Active')
+                  if (item.BulkFoodStatus === true)
                     return (
                       <Picker.Item
                         color="black"
@@ -234,7 +255,7 @@ export default class BulkOrder extends Component {
               onChangeText={this.onChangeText}
               value={this.state.contact}
               nameState="contact"
-              keyboardType="numeric"
+              keyboardType="number-pad"
             />
 
             <TouchableOpacity
@@ -251,6 +272,17 @@ export default class BulkOrder extends Component {
             </TouchableOpacity>
           </ScrollView>
         </View>
+
+        {/* WARNING MESSAGE ALERT */}
+        <WarningMessage
+          title="Warning!"
+          message="Please input suitable field"
+          // confirmText="Yes, Delete"
+          {...this.props}
+          hideAlert={this.hideAlert}
+          showAlert={showAlert}
+          // confirmAlert={this.hideAlert}
+        />
       </SafeAreaView>
     );
   }

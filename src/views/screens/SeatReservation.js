@@ -32,10 +32,12 @@
 // });
 
 import React, {useState} from 'react';
+import {Alert} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import PhoneNumber from '../components/otp/PhoneNumber';
 import VerifyCode from '../components/otp/VerifyCode';
 import Authenticated from '../components/otp/Authenticated';
+import FIREBASE from '../../config/FIREBASE';
 
 export default function App() {
   const [confirm, setConfirm] = useState(null);
@@ -43,31 +45,62 @@ export default function App() {
   const [seat, setSeat] = useState(null);
   const [mobile, setMobile] = useState(null);
   const [isDate, setDate] = useState(null);
+  const [name, setName] = useState(null);
 
-  async function signIn(phoneNumber, seats, isDate) {
-    console.log('signIn');
-    setMobile(phoneNumber);
-    setSeat(seats);
-    setDate(isDate);
-    try {
-      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-      console.log(phoneNumber, seats);
-
-      setConfirm(confirmation);
-    } catch (error) {
-      alert(error);
-      console.log(error);
+  async function signIn(name, phoneNumber, seats, isDate) {
+    console.log('Function signIn');
+    if (name && phoneNumber && seats && isDate) {
+      console.log('Valid');
+      setMobile(phoneNumber);
+      setSeat(seats);
+      setDate(isDate);
+      setName(name);
+      console.log(name, phoneNumber, seats, isDate);
+      try {
+        const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+        // console.log(phoneNumber, seats);
+        setConfirm(confirmation);
+      } catch (error) {
+        alert(error);
+        console.log(error);
+      }
+    } else {
+      // console.log('Input Here');
+      Alert.alert('Warning!', 'Please Fill Suitable field');
     }
   }
+
+  SubmitOrder = otpcode => {
+    console.log('SubmitFuction');
+    const AddSatReservation = FIREBASE.database().ref('Seat_Reservation');
+    const Reservation = {
+      CustomerName: name,
+      status: true,
+      otp: otpcode,
+      Seat: seat,
+      CustomerContactNo: mobile,
+      GiveDate: isDate,
+      OrderderedDate: new Date().toDateString(),
+    };
+    AddSatReservation.push(Reservation)
+      .then(data => {
+        console.log('Added');
+        Alert.alert('Success', 'Order Success');
+      })
+      .catch(error => {
+        console.log('Error :', error);
+      });
+  };
 
   async function confirmVerificationCode(code) {
     console.log('confirmVerificationCode');
     try {
       await confirm.confirm(code);
-      // console.log(code);
+      SubmitOrder(code);
       console.log(seat, mobile, code, isDate, new Date().toDateString());
       setConfirm(null);
     } catch (error) {
+      console.log(error);
       alert('Invalid code');
     }
   }

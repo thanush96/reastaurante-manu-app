@@ -94,10 +94,10 @@ const styles = StyleSheet.create({
   },
 
   TextBody: {
-    flex: 2,
-    marginHorizontal: 50,
+    flex: 3,
+    marginHorizontal: 0,
     justifyContent: 'center',
-    // alignItems: 'center',
+    alignItems: 'center',
     // backgroundColor:'red'
   },
 });
