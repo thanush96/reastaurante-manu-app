@@ -17,6 +17,7 @@ import InputData from '../../maincomponents/InputBox';
 import FIREBASE from '../../config/FIREBASE';
 import DatePicker from 'react-native-datepicker';
 import WarningMessage from '../components/Alert/warningMessage';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default class BulkOrder extends Component {
   constructor(props) {
@@ -32,6 +33,8 @@ export default class BulkOrder extends Component {
       selectedHours: 0,
       selectedMinutes: 0,
       showAlert: false,
+      successAlertMsg: false,
+      loading: false,
       // refreshing: false,
     };
   }
@@ -87,7 +90,16 @@ export default class BulkOrder extends Component {
       AddBulkOrders.push(BulkOrders)
         .then(data => {
           // console.log('Added');
-          Alert.alert('Success', 'Order Success');
+          this.setState({
+            loading: true,
+          });
+          setTimeout(() => {
+            this.setState({
+              loading: false,
+            });
+          }, 1000);
+          // Alert.alert('Success', 'Order Success');
+          this.successShowAlert();
           this.setState({
             name: '',
             contact: '',
@@ -129,16 +141,28 @@ export default class BulkOrder extends Component {
   };
 
   hideAlert = () => {
-    console.log('hide');
     this.setState({
       showAlert: false,
+    });
+  };
+
+  // SUCCESSFULL ALERT FUNCTIONS
+  successShowAlert = () => {
+    this.setState({
+      successAlertMsg: true,
+    });
+  };
+
+  hideAlertSuccessMsg = () => {
+    this.setState({
+      successAlertMsg: false,
     });
   };
 
   render() {
     var today = new Date();
     today.setDate(today.getDate() + 3);
-    const {showAlert} = this.state;
+    const {showAlert, successAlertMsg} = this.state;
 
     return (
       <SafeAreaView style={styles.conatiner}>
@@ -157,8 +181,6 @@ export default class BulkOrder extends Component {
             //   />
             // }
           >
-            <Text style={{fontSize: 16, marginBottom: 5}}>Food Name</Text>
-
             <View style={styles.card}>
               <Picker
                 onValueChange={(itemVlue, itemIndex) =>
@@ -166,11 +188,14 @@ export default class BulkOrder extends Component {
                     foodItem: itemVlue,
                   })
                 }>
-                {/* <Picker.Item
-                  label="--Select Food--"
-                  value="default"
-                  style={{color: '#D3D3D3'}}
-                /> */}
+                <Picker.Item
+                  label="Select Your Food"
+                  value=""
+                  style={{
+                    color: '#D3D3D3',
+                    fontSize: 14,
+                  }}
+                />
                 {this.state.dataSource.map((item, index) => {
                   {
                     /* console.log(item.FoodStatus); */
@@ -188,15 +213,6 @@ export default class BulkOrder extends Component {
               </Picker>
             </View>
 
-            <InputData
-              label="Parcels"
-              placeholder="Number Of Parcels"
-              onChangeText={this.onChangeText}
-              value={this.state.parcels}
-              nameState="parcels"
-              keyboardType="numeric"
-            />
-
             <DatePicker
               style={styles.datePickerStyle}
               date={this.state.date}
@@ -213,11 +229,15 @@ export default class BulkOrder extends Component {
                   position: 'absolute',
                   left: 0,
                   top: 4,
-                  marginLeft: 0,
+                  marginLeft: 10,
                 },
                 dateInput: {
-                  marginLeft: 36,
+                  marginLeft: 0,
                   borderRadius: 5,
+                  backgroundColor: 'grey',
+                  borderRadius: 50,
+                  height: 45,
+                  borderWidth: 0,
                 },
               }}
               onDateChange={date => {
@@ -242,7 +262,14 @@ export default class BulkOrder extends Component {
             /> */}
 
             <InputData
-              label="Your Name"
+              placeholder="Number Of Parcels"
+              onChangeText={this.onChangeText}
+              value={this.state.parcels}
+              nameState="parcels"
+              keyboardType="numeric"
+            />
+
+            <InputData
               placeholder="Enter Your Name here"
               onChangeText={this.onChangeText}
               value={this.state.name}
@@ -250,7 +277,6 @@ export default class BulkOrder extends Component {
             />
 
             <InputData
-              label="Contact"
               placeholder="Enter your Contact Number"
               onChangeText={this.onChangeText}
               value={this.state.contact}
@@ -265,7 +291,7 @@ export default class BulkOrder extends Component {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.touch}
+              style={styles.clear}
               onPress={() => this.clear()}
               keyboardShouldPersistTaps={'always'}>
               <Text style={styles.submit}>Clear</Text>
@@ -275,13 +301,33 @@ export default class BulkOrder extends Component {
 
         {/* WARNING MESSAGE ALERT */}
         <WarningMessage
-          title="Warning!"
+          title="Sorry!"
           message="Please input suitable field"
           // confirmText="Yes, Delete"
           {...this.props}
           hideAlert={this.hideAlert}
           showAlert={showAlert}
           // confirmAlert={this.hideAlert}
+        />
+
+        {/* SUCCESS MESSAGE ALERT */}
+        <WarningMessage
+          title="Thank You!"
+          message="Your submission is received and we will contact you soon"
+          // confirmText="Yes, Delete"
+          {...this.props}
+          hideAlert={this.hideAlertSuccessMsg}
+          showAlert={successAlertMsg}
+          // confirmAlert={this.hideAlert}
+        />
+
+        <Spinner
+          //visibility of Overlay Loading Spinner
+          visible={this.state.loading}
+          //Text with the Spinner
+          textContent={'Loading...'}
+          //Text style of the Spinner Text
+          textStyle={styles.spinnerTextStyle}
         />
       </SafeAreaView>
     );
@@ -310,15 +356,24 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    borderWidth: 1,
-    borderColor: 'grey',
+    // borderWidth: 1,
+    // borderColor: 'grey',
+    backgroundColor: 'grey',
     color: 'black',
-    borderRadius: 5,
+    borderRadius: 50,
     marginBottom: 10,
   },
 
   touch: {
     backgroundColor: COLORS.secondary,
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    borderRadius: 50,
+  },
+
+  clear: {
+    backgroundColor: COLORS.primary,
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
@@ -330,8 +385,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
   },
+
   datePickerStyle: {
     width: 300,
     marginTop: 10,
+  },
+  spinnerTextStyle: {
+    color: '#FFF',
   },
 });

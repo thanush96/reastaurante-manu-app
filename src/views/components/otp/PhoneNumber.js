@@ -12,13 +12,14 @@ import {
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import DatePicker from 'react-native-datepicker';
 import COLORS from '../../../const/colors';
-import PhoneInput from 'react-native-phone-input';
+import PhoneInput from 'react-native-phone-number-input';
 
 export default function PhoneNumber(props) {
   const [name, setName] = useState(null);
   const [seats, setSeats] = useState(null);
-  const [phoneNumber, setPhoneNumber] = useState(null);
   const [isDate, setDate] = useState(null);
+  const [value, setValue] = useState('');
+  const [formattedValue, setFormattedValue] = useState('');
 
   // const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -49,13 +50,22 @@ export default function PhoneNumber(props) {
         <Text style={styles.title}>Seat Reservation</Text>
       </View>
       <ScrollView>
-      <View style={styles.screen}>
-        <Text style={styles.text}>Enter Your Name</Text>
-        <TextInput style={styles.input} value={name} onChangeText={setName} />
+        <View style={styles.screen}>
+          <TextInput
+            style={styles.input}
+            value={name}
+            onChangeText={setName}
+            placeholder="Your Name"
+          />
 
-        <Text style={styles.text}>Seats</Text>
-        <TextInput style={styles.input} value={seats} onChangeText={setSeats} />
-        {/*
+          <TextInput
+            style={styles.input}
+            value={seats}
+            onChangeText={setSeats}
+            placeholder="Seats"
+            keyboardType="number-pad"
+          />
+          {/*
       <Text style={styles.text}>Booking Date</Text>
       <TextInput
         autoFocus
@@ -72,67 +82,74 @@ export default function PhoneNumber(props) {
         onCancel={hideDatePicker}
       />  */}
 
-        <DatePicker
-          style={styles.datePickerStyle}
-          date={isDate}
-          mode="date"
-          placeholder="Select Your Order date"
-          format="DD-MM-YYYY"
-          minDate={today}
-          maxDate="01-01-2051"
-          confirmBtnText="Confirm"
-          cancelBtnText="Cancel"
-          customStyles={{
-            dateIcon: {
-              // display: 'none',
-              position: 'absolute',
-              left: 0,
-              top: 4,
-              marginLeft: 0,
-            },
-            dateInput: {
-              marginLeft: 0,
-              borderRadius: 5,
-            },
-          }}
-          onDateChange={date => {
-            setDate(date);
-            // console.log(new Date().toDateString());
-          }}
-        />
+          <DatePicker
+            style={styles.datePickerStyle}
+            date={isDate}
+            mode="date"
+            placeholder="Select Your Order date"
+            format="DD-MM-YYYY"
+            minDate={today}
+            maxDate="01-01-2051"
+            confirmBtnText="Confirm"
+            cancelBtnText="Cancel"
+            customStyles={{
+              dateIcon: {
+                // display: 'none',
+                position: 'absolute',
+                left: 0,
+                top: 4,
+                marginLeft: 10,
+              },
+              dateInput: {
+                marginLeft: 0,
+                borderRadius: 5,
+                backgroundColor: 'grey',
+                borderRadius: 50,
+                height: 45,
+                borderWidth: 0,
+              },
+            }}
+            onDateChange={date => {
+              setDate(date);
+              // console.log(new Date().toDateString());
+            }}
+          />
 
-        <Text style={styles.text}>Enter Phone Number</Text>
-        {/* <TextInput
-          style={styles.input}
-          value={phoneNumber}
-          keyboardType="number-pad"
-          onChangeText={setPhoneNumber}
-        /> */}
+          <PhoneInput
+            defaultValue={value}
+            defaultCode="LK"
+            layout="first"
+            onChangeFormattedText={text => {
+              setFormattedValue(text);
+            }}
+            containerStyle={{
+              backgroundColor: 'grey',
+              borderRadius: 50,
+              width: 300,
+              height: 45,
+              marginTop: 20,
+            }}
+            textContainerStyle={{backgroundColor: 'grey', borderRadius: 50}}
+            // textInputStyle={{backgroundColor: 'red'}}
+            textInputProps={{maxLength: 9, padding: 0}}
+            // withDarkTheme
+            // withShadow
+          />
 
-        {/* <PhoneInput ref="phone" /> */}
-        <PhoneInput
-          style={styles.phoneInput}
-          value={phoneNumber}
-          keyboardType="number-pad"
-          onChangePhoneNumber={setPhoneNumber}
-          initialCountry={'us'}
-         
-        />
+          <TouchableOpacity
+            style={styles.touch}
+            onPress={() => props.onSubmit(name, formattedValue, seats, isDate)}
+            keyboardShouldPersistTaps={'always'}>
+            <Text style={styles.submit}>Book now</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.touch}
-          onPress={() => props.onSubmit(name, phoneNumber, seats, isDate)}
-          keyboardShouldPersistTaps={'always'}>
-          <Text style={styles.submit}>Book now</Text>
-        </TouchableOpacity>
-
-        {/* <TouchableOpacity
+          {/* <TouchableOpacity
           style={styles.touch}
           onPressIn={reset()}
           keyboardShouldPersistTaps={'always'}>
           <Text style={styles.submit}>Clear</Text>
         </TouchableOpacity> */}
-      </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -149,7 +166,6 @@ const styles = StyleSheet.create({
   pages: {
     flex: 1,
     padding: 30,
-    // backgroundColor:'green'
   },
   title: {
     fontSize: 30,
@@ -160,33 +176,24 @@ const styles = StyleSheet.create({
   },
   screen: {
     backgroundColor: 'green',
-
     marginTop: 20,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
   },
   input: {
-    borderWidth: 1,
-    borderColor: 'lightblue',
+    borderRadius: 50,
     width: 300,
+    height: 45,
     marginVertical: 10,
-    fontSize: 18,
+    fontSize: 14,
     padding: 10,
-    borderRadius: 8,
-  },
-  phoneInput: {
-    borderWidth: 1,
+    color: 'black',
     backgroundColor: 'grey',
-    borderColor: 'lightblue',
-    width: 300,
-    marginVertical: 10,
-    fontSize: 18,
-    padding: 10,
-    borderRadius: 8,
   },
+
   text: {
-    fontSize: 18,
+    fontSize: 14,
   },
   datePickerStyle: {
     width: 300,
@@ -197,8 +204,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.secondary,
     padding: 10,
     borderRadius: 5,
-    marginTop: 10,
+    marginTop: 20,
     borderRadius: 50,
+
   },
   submit: {
     width: 280,

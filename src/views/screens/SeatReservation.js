@@ -32,12 +32,13 @@
 // });
 
 import React, {useState} from 'react';
-import {Alert} from 'react-native';
+import {Alert, StyleSheet} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import PhoneNumber from '../components/otp/PhoneNumber';
 import VerifyCode from '../components/otp/VerifyCode';
 import Authenticated from '../components/otp/Authenticated';
 import FIREBASE from '../../config/FIREBASE';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default function App() {
   const [confirm, setConfirm] = useState(null);
@@ -46,6 +47,7 @@ export default function App() {
   const [mobile, setMobile] = useState(null);
   const [isDate, setDate] = useState(null);
   const [name, setName] = useState(null);
+  // const [loading, setLoading] = useState(false);
 
   async function signIn(name, phoneNumber, seats, isDate) {
     console.log('Function signIn');
@@ -84,8 +86,12 @@ export default function App() {
     };
     AddSatReservation.push(Reservation)
       .then(data => {
-        console.log('Added');
-        Alert.alert('Success', 'Order Success');
+        console.log('Order Success');
+        // setLoading(true);
+        // setTimeout(() => {
+        //   setLoading(false);
+        // }, 5000);
+        // Alert.alert('Success', 'Order Success');
       })
       .catch(error => {
         console.log('Error :', error);
@@ -117,5 +123,26 @@ export default function App() {
 
   if (confirm) return <VerifyCode onSubmit={confirmVerificationCode} />;
 
-  return <PhoneNumber onSubmit={signIn} />;
-}
+  return <PhoneNumber onSubmit={signIn} />}
+
+
+//   return (
+//     (
+//       <Spinner
+//         //visibility of Overlay Loading Spinner
+//         visible={loading}
+//         //Text with the Spinner
+//         textContent={'Loading...'}
+//         //Text style of the Spinner Text
+//         textStyle={styles.spinnerTextStyle}
+//       />
+//     ),
+//     (<PhoneNumber onSubmit={signIn} />)
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   spinnerTextStyle: {
+//     color: '#FFF',
+//   },
+// });

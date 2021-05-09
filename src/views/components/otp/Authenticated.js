@@ -1,15 +1,35 @@
 import React from 'react';
-import {StyleSheet, Text, View, Button} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import COLORS from '../../../const/colors';
 
 export default function Authenticated() {
   return (
-    <View style={styles.screen}>
+    <View style={styles.screen} keyboardShouldPersistTaps="handled">
       {/* <Text style={styles.phoneNumber}>{auth().currentUser.phoneNumber}</Text> */}
-      <Text>Successsfull Your Reservation</Text>
-      <View style={{marginTop: 30}}>
+      <Image
+        source={require('../../../assets/success.png')}
+        style={{width: 100, height: 100, marginBottom: 20}}
+      />
+      <Text style={styles.text}>Successsfull Your Reservation</Text>
+
+      <TouchableOpacity
+        style={styles.touch}
+        onPress={() => auth().signOut()}
+        keyboardShouldPersistTaps={'always'}>
+        <Text style={styles.submit}>Back To Home</Text>
+      </TouchableOpacity>
+
+      {/* <View style={{marginTop: 30}}>
         <Button title="Back To Home" onPress={() => auth().signOut()} />
-      </View>
+      </View> */}
     </View>
   );
 }
@@ -19,21 +39,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  input: {
-    borderWidth: 2,
-    borderColor: 'lightblue',
-    width: 300,
-    marginVertical: 30,
-    fontSize: 25,
-    padding: 10,
-    borderRadius: 8,
+    backgroundColor: COLORS.white,
   },
   text: {
-    fontSize: 25,
+    marginTop: 10,
+    fontSize: 20,
+    color: COLORS.primary,
   },
   phoneNumber: {
     fontSize: 21,
     marginTop: 20,
+  },
+  touch: {
+    backgroundColor: COLORS.secondary,
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 30,
+    borderRadius: 50,
+  },
+  submit: {
+    width: 280,
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 16,
   },
 });
