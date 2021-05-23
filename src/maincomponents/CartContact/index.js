@@ -26,8 +26,8 @@ const CardContact = ({id, contactItem, navigation, removeData}) => {
       </View>
       <View style={styles.TextBody}>
         <Text style={styles.name}>{contactItem.name}</Text>
-        <Text style={styles.age}>Rs {contactItem.age}.00</Text>
-        <Text style={styles.address}>{contactItem.address}</Text>
+        <Text style={styles.price}>Rs {contactItem.unitPrice}.00</Text>
+        <Text style={styles.description}>{contactItem.description}</Text>
       </View>
 
       {/* <View style={styles.icon}>
@@ -69,11 +69,11 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 10,
   },
   name: {fontWeight: 'bold', fontSize: 30, color: COLORS.secondary},
-  age: {
+  price: {
     fontSize: 18,
     color: 'white',
   },
-  address: {
+  description: {
     fontSize: 12,
     color: 'black',
   },
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    borderColor:'white',
+    borderColor: 'white',
   },
 
   imgBody: {

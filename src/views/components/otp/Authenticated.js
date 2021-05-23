@@ -14,10 +14,12 @@ export default function Authenticated() {
   return (
     <View style={styles.screen} keyboardShouldPersistTaps="handled">
       {/* <Text style={styles.phoneNumber}>{auth().currentUser.phoneNumber}</Text> */}
+
       <Image
-        source={require('../../../assets/success.png')}
+        source={require('../../../assets/success.gif')}
         style={{width: 100, height: 100, marginBottom: 20}}
       />
+      <Text style={styles.text}>Keep your OTP</Text>
       <Text style={styles.text}>Successsfull Your Reservation</Text>
 
       <TouchableOpacity
@@ -39,7 +41,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: 'white',
   },
   text: {
     marginTop: 10,

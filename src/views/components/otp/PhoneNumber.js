@@ -4,12 +4,11 @@ import {
   Text,
   SafeAreaView,
   View,
-  Button,
   TextInput,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+// import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import DatePicker from 'react-native-datepicker';
 import COLORS from '../../../const/colors';
 import PhoneInput from 'react-native-phone-number-input';
@@ -18,30 +17,30 @@ export default function PhoneNumber(props) {
   const [name, setName] = useState(null);
   const [seats, setSeats] = useState(null);
   const [isDate, setDate] = useState(null);
-  const [value, setValue] = useState('');
+  // const [value, setValue] = useState('');
   const [formattedValue, setFormattedValue] = useState('');
 
   // const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
+  // const showDatePicker = () => {
+  //   setDatePickerVisibility(true);
+  // };
 
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
+  // const hideDatePicker = () => {
+  //   setDatePickerVisibility(false);
+  // };
 
-  const handleConfirm = date => {
-    console.log('A date has been picked: ', date);
-    setDate(date);
-    console.log(isDate);
-    hideDatePicker();
-  };
+  // const handleConfirm = date => {
+  //   console.log('A date has been picked: ', date);
+  //   setDate(date);
+  //   console.log(isDate);
+  //   hideDatePicker();
+  // };
 
-  const onPhoneInputChange = value => {
-    console.log('Phone');
-    setPhoneNumber(value);
-  };
+  // const onPhoneInputChange = value => {
+  //   console.log('Phone');
+  //   setPhoneNumber(value);
+  // };
 
   var today = new Date();
   return (
@@ -52,6 +51,7 @@ export default function PhoneNumber(props) {
       <ScrollView>
         <View style={styles.screen}>
           <TextInput
+            placeholderTextColor="#C7C7CD"
             style={styles.input}
             value={name}
             onChangeText={setName}
@@ -59,11 +59,13 @@ export default function PhoneNumber(props) {
           />
 
           <TextInput
+            placeholderTextColor="#C7C7CD"
             style={styles.input}
             value={seats}
             onChangeText={setSeats}
             placeholder="Seats"
             keyboardType="number-pad"
+            maxLength={3}
           />
           {/*
       <Text style={styles.text}>Booking Date</Text>
@@ -116,7 +118,7 @@ export default function PhoneNumber(props) {
           />
 
           <PhoneInput
-            defaultValue={value}
+            defaultValue={formattedValue}
             defaultCode="LK"
             layout="first"
             onChangeFormattedText={text => {
@@ -127,10 +129,10 @@ export default function PhoneNumber(props) {
               borderRadius: 50,
               width: 300,
               height: 45,
-              marginTop: 20,
+              marginTop: 18,
             }}
             textContainerStyle={{backgroundColor: 'grey', borderRadius: 50}}
-            // textInputStyle={{backgroundColor: 'red'}}
+            // textInputStyle={{padding: 0}}
             textInputProps={{maxLength: 9, padding: 0}}
             // withDarkTheme
             // withShadow
@@ -185,11 +187,12 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     width: 300,
     height: 45,
-    marginVertical: 10,
+    marginVertical: 7,
     fontSize: 14,
     padding: 10,
     color: 'black',
     backgroundColor: 'grey',
+    // textAlign:'center'
   },
 
   text: {
@@ -206,7 +209,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 20,
     borderRadius: 50,
-
   },
   submit: {
     width: 280,

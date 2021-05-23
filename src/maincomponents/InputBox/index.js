@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet,TextInput} from 'react-native';
+import {StyleSheet, TextInput} from 'react-native';
 
 const InputData = ({
   placeholder,
@@ -11,7 +11,7 @@ const InputData = ({
   return (
     <>
       <TextInput
-        placeholderTextColor="#D3D3D3"
+        placeholderTextColor="#C7C7CD"
         placeholder={placeholder}
         style={styles.textInput}
         keyboardType={keyboardType}
@@ -27,13 +27,14 @@ export default InputData;
 const styles = StyleSheet.create({
   textInput: {
     borderRadius: 50,
+    width: 300,
     height: 45,
-    marginVertical: 10,
+    marginVertical: 8,
     fontSize: 14,
     padding: 10,
     color: 'black',
     backgroundColor: 'grey',
-    textAlign:'center',
+    // textAlign: 'center',
     // textAlignVertical : 'center'
   },
 });

@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   Alert,
   View,
   Platform,
@@ -35,6 +36,8 @@ export default class BulkOrder extends Component {
       showAlert: false,
       successAlertMsg: false,
       loading: false,
+      oldDates: [],
+
       // refreshing: false,
     };
   }
@@ -56,7 +59,21 @@ export default class BulkOrder extends Component {
           var childData = childSnapshot.val();
           items.push(childData);
         });
+        return items;
+      });
+  }
 
+  async get_holidays() {
+    return FIREBASE.database()
+      .ref('holidays')
+      .once('value')
+      .then(function (snapshot) {
+        var items = [];
+        snapshot.forEach(function (childSnapshot) {
+          var childKey = childSnapshot.key;
+          var childData = childSnapshot.val();
+          items.push(childData);
+        });
         return items;
       });
   }
@@ -64,19 +81,32 @@ export default class BulkOrder extends Component {
   async componentWillMount() {
     this.setState({
       dataSource: await this.get_firebase_list(),
+      oldDates: await this.get_holidays(),
       // refreshing: false,
     });
-    // console.log(this.state.dataSource);
-    // console.log('Refreshing..');
   }
 
   onSubmit = () => {
-    // console.log(this.state.selectedMinutes);
+    let phoneNumberLength = this.state.contact.length;
+    let duplicate = false;
+    if (this.state.date) {
+      this.state.oldDates.map((item, index) => {
+        if (item.holidayDate === this.state.date) {
+          duplicate = true;
+        }
+      });
+    }
+    // else {
+    //   this.showAlert();
+    // }
     if (
       this.state.foodItem &&
       this.state.name &&
+      !duplicate &&
+      !isNaN(this.state.parcels) &&
       this.state.parcels &&
-      this.state.contact
+      !isNaN(this.state.contact) &&
+      phoneNumberLength === 10
     ) {
       const AddBulkOrders = FIREBASE.database().ref('BulkOrders');
       const BulkOrders = {
@@ -86,6 +116,7 @@ export default class BulkOrder extends Component {
         CustomerContactNo: this.state.contact,
         GiveDate: this.state.date,
         OrderderedDate: new Date().toDateString(),
+        status: true,
       };
       AddBulkOrders.push(BulkOrders)
         .then(data => {
@@ -97,8 +128,7 @@ export default class BulkOrder extends Component {
             this.setState({
               loading: false,
             });
-          }, 1000);
-          // Alert.alert('Success', 'Order Success');
+          }, 7000);
           this.successShowAlert();
           this.setState({
             name: '',
@@ -113,14 +143,8 @@ export default class BulkOrder extends Component {
         });
     } else {
       this.showAlert();
-      // Alert.alert('Error', 'Please Input here');
     }
   };
-
-  // _onRefresh = () => {
-  //   this.setState({refreshing: true});
-  //   this.componentWillMount();
-  // };
 
   clear = () => {
     this.setState({
@@ -228,7 +252,7 @@ export default class BulkOrder extends Component {
                   // display: 'none',
                   position: 'absolute',
                   left: 0,
-                  top: 4,
+                  top: 0,
                   marginLeft: 10,
                 },
                 dateInput: {
@@ -237,6 +261,7 @@ export default class BulkOrder extends Component {
                   backgroundColor: 'grey',
                   borderRadius: 50,
                   height: 45,
+                  marginBottom: 10,
                   borderWidth: 0,
                 },
               }}
@@ -261,12 +286,14 @@ export default class BulkOrder extends Component {
               }}
             /> */}
 
-            <InputData
+            <TextInput
+              style={styles.textInput}
               placeholder="Number Of Parcels"
-              onChangeText={this.onChangeText}
+              onChangeText={text => this.setState({parcels: text})}
               value={this.state.parcels}
-              nameState="parcels"
-              keyboardType="numeric"
+              placeholderTextColor="#C7C7CD"
+              keyboardType="number-pad"
+              maxLength={3}
             />
 
             <InputData
@@ -276,12 +303,14 @@ export default class BulkOrder extends Component {
               nameState="name"
             />
 
-            <InputData
-              placeholder="Enter your Contact Number"
-              onChangeText={this.onChangeText}
+            <TextInput
+              style={styles.textInput}
+              placeholderTextColor="#C7C7CD"
+              placeholder="Enter Your Contact number here"
+              onChangeText={text => this.setState({contact: text})}
               value={this.state.contact}
-              nameState="contact"
-              keyboardType="number-pad"
+              keyboardType="numeric"
+              maxLength={10}
             />
 
             <TouchableOpacity
@@ -304,7 +333,7 @@ export default class BulkOrder extends Component {
           title="Sorry!"
           message="Please input suitable field"
           // confirmText="Yes, Delete"
-          {...this.props}
+          // {...this.props}
           hideAlert={this.hideAlert}
           showAlert={showAlert}
           // confirmAlert={this.hideAlert}
@@ -315,7 +344,7 @@ export default class BulkOrder extends Component {
           title="Thank You!"
           message="Your submission is received and we will contact you soon"
           // confirmText="Yes, Delete"
-          {...this.props}
+          // {...this.props}
           hideAlert={this.hideAlertSuccessMsg}
           showAlert={successAlertMsg}
           // confirmAlert={this.hideAlert}
@@ -362,6 +391,19 @@ const styles = StyleSheet.create({
     color: 'black',
     borderRadius: 50,
     marginBottom: 10,
+  },
+
+  textInput: {
+    borderRadius: 50,
+    width: 300,
+    height: 45,
+    marginVertical: 8,
+    fontSize: 14,
+    padding: 10,
+    color: 'black',
+    backgroundColor: 'grey',
+
+    // textAlign: 'center',
   },
 
   touch: {

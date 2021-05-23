@@ -9,10 +9,8 @@ import {
   SafeAreaView,
   RefreshControl,
 } from 'react-native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import FIREBASE from '../../config/FIREBASE';
-import {CardContact} from '../../maincomponents';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import {CardContact, CategoryCard} from '../../maincomponents';
 import COLORS from '../../const/colors';
 import {LogBox} from 'react-native';
 LogBox.ignoreLogs(['Warning: ...']);
@@ -25,18 +23,56 @@ export default class Home extends Component {
     this.state = {
       contact: {},
       contactKey: [],
+      category: {},
+      categoryKey: [],
       refreshing: false,
     };
   }
 
   componentDidMount() {
     this.MountData();
-    console.log('Load And Refreshing');
+    this.MountCategory();
   }
 
-  MountData() {
+  triggerData = category => {
+    let foodCategory = category;
     FIREBASE.database()
       .ref('contact')
+      .orderByChild('category')
+      .equalTo(foodCategory)
+      .once('value', querySnapShot => {
+        let data = querySnapShot.val() ? querySnapShot.val() : {};
+        let contactItem = {...data};
+
+        console.log('Category : ', category);
+
+        this.setState({
+          contact: contactItem,
+          contactKey: Object.keys(contactItem),
+          refreshing: false,
+        });
+
+        console.log('Array : ', this.state.contact);
+
+        // this.state.contactKey.map(key =>
+        //   console.log(this.state.contact[key].MenuFoodStatus),
+        // );
+      });
+  };
+
+  MountData() {
+    // FIREBASE.database()
+    //   .ref('contact')
+    //   .orderByChild('category')
+    //   // .equalTo('Lunch')
+    //   .on('child_added', function (data) {
+    //     console.log('Equal to filter: ' + data.val().name);
+    //   });
+
+    FIREBASE.database()
+      .ref('contact')
+      // .orderByChild('category')
+      // .equalTo('Breakfast')
       .once('value', querySnapShot => {
         let data = querySnapShot.val() ? querySnapShot.val() : {};
         let contactItem = {...data};
@@ -46,10 +82,21 @@ export default class Home extends Component {
           contactKey: Object.keys(contactItem),
           refreshing: false,
         });
+      });
+  }
 
-        this.state.contactKey.map(key =>
-          console.log(this.state.contact[key].MenuFoodStatus),
-        );
+  MountCategory() {
+    FIREBASE.database()
+      .ref('categories')
+      .once('value', querySnapShot => {
+        let data = querySnapShot.val() ? querySnapShot.val() : {};
+        let categoryItem = {...data};
+
+        this.setState({
+          category: categoryItem,
+          categoryKey: Object.keys(categoryItem),
+          // refreshing: false,
+        });
       });
   }
 
@@ -59,15 +106,36 @@ export default class Home extends Component {
   };
 
   render() {
-    const {contact, contactKey} = this.state;
+    const {category, categoryKey, contact, contactKey} = this.state;
     return (
       <View style={styles.conatiner}>
         <View style={styles.mainheader}>
           <Text style={styles.headertitle}>
-            <Icon name="home-filled" size={26} />
+            {/* <Icon name="home-filled" size={26} /> */}
             Menu
           </Text>
         </View>
+
+        <View style={styles.categorieItems}>
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+            <TouchableOpacity
+              onPress={() => {
+                this.MountData();
+              }}>
+              <Text style={styles.categories}>All</Text>
+            </TouchableOpacity>
+            {categoryKey.length > 0
+              ? categoryKey.map(key => (
+                  <CategoryCard
+                    category={category[key]}
+                    id={key}
+                    triggerData={this.triggerData}
+                  />
+                ))
+              : null}
+          </ScrollView>
+        </View>
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -75,9 +143,7 @@ export default class Home extends Component {
               refreshing={this.state.refreshing}
               onRefresh={this._onRefresh}
             />
-          }
-
-          >
+          }>
           <View style={styles.page}>
             {contactKey.length > 0 ? (
               contactKey.map(key =>
@@ -92,7 +158,7 @@ export default class Home extends Component {
                 ) : null,
               )
             ) : (
-              <Text> loading...</Text>
+              <Text> No Foods Available</Text>
             )}
           </View>
         </ScrollView>
@@ -117,6 +183,21 @@ const styles = StyleSheet.create({
     top: 50,
   },
 
+  categories: {
+    backgroundColor: COLORS.secondary,
+    padding: 10,
+    marginTop: 10,
+    marginLeft: 10,
+    width: 100,
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
+    borderRadius: 50,
+  },
+
+  categorieItems: {
+    flexDirection: 'row',
+  },
   page: {
     flex: 1,
     paddingHorizontal: 30,
@@ -159,5 +240,3 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 });
-
-
