@@ -17,30 +17,8 @@ export default function PhoneNumber(props) {
   const [name, setName] = useState(null);
   const [seats, setSeats] = useState(null);
   const [isDate, setDate] = useState(null);
-  // const [value, setValue] = useState('');
   const [formattedValue, setFormattedValue] = useState('');
 
-  // const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-
-  // const showDatePicker = () => {
-  //   setDatePickerVisibility(true);
-  // };
-
-  // const hideDatePicker = () => {
-  //   setDatePickerVisibility(false);
-  // };
-
-  // const handleConfirm = date => {
-  //   console.log('A date has been picked: ', date);
-  //   setDate(date);
-  //   console.log(isDate);
-  //   hideDatePicker();
-  // };
-
-  // const onPhoneInputChange = value => {
-  //   console.log('Phone');
-  //   setPhoneNumber(value);
-  // };
 
   var today = new Date();
   return (
@@ -67,22 +45,6 @@ export default function PhoneNumber(props) {
             keyboardType="number-pad"
             maxLength={3}
           />
-          {/*
-      <Text style={styles.text}>Booking Date</Text>
-      <TextInput
-        autoFocus
-        style={styles.input}
-        value={isDate}
-        onPressIn={showDatePicker}
-        onChangeText={setDate}
-      />
-       <Button title="Show Date Picker" onPress={showDatePicker} />
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />  */}
 
           <DatePicker
             style={styles.datePickerStyle}
@@ -113,7 +75,6 @@ export default function PhoneNumber(props) {
             }}
             onDateChange={date => {
               setDate(date);
-              // console.log(new Date().toDateString());
             }}
           />
 
@@ -144,13 +105,6 @@ export default function PhoneNumber(props) {
             keyboardShouldPersistTaps={'always'}>
             <Text style={styles.submit}>Book now</Text>
           </TouchableOpacity>
-
-          {/* <TouchableOpacity
-          style={styles.touch}
-          onPressIn={reset()}
-          keyboardShouldPersistTaps={'always'}>
-          <Text style={styles.submit}>Clear</Text>
-        </TouchableOpacity> */}
         </View>
       </ScrollView>
     </SafeAreaView>

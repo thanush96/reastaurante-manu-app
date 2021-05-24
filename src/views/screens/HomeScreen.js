@@ -44,19 +44,11 @@ export default class Home extends Component {
         let data = querySnapShot.val() ? querySnapShot.val() : {};
         let contactItem = {...data};
 
-        console.log('Category : ', category);
-
         this.setState({
           contact: contactItem,
           contactKey: Object.keys(contactItem),
           refreshing: false,
         });
-
-        console.log('Array : ', this.state.contact);
-
-        // this.state.contactKey.map(key =>
-        //   console.log(this.state.contact[key].MenuFoodStatus),
-        // );
       });
   };
 
@@ -71,8 +63,6 @@ export default class Home extends Component {
 
     FIREBASE.database()
       .ref('contact')
-      // .orderByChild('category')
-      // .equalTo('Breakfast')
       .once('value', querySnapShot => {
         let data = querySnapShot.val() ? querySnapShot.val() : {};
         let contactItem = {...data};
@@ -110,10 +100,7 @@ export default class Home extends Component {
     return (
       <View style={styles.conatiner}>
         <View style={styles.mainheader}>
-          <Text style={styles.headertitle}>
-            {/* <Icon name="home-filled" size={26} /> */}
-            Menu
-          </Text>
+          <Text style={styles.headertitle}>Menu</Text>
         </View>
 
         <View style={styles.categorieItems}>
@@ -128,7 +115,7 @@ export default class Home extends Component {
               ? categoryKey.map(key => (
                   <CategoryCard
                     category={category[key]}
-                    id={key}
+                    key={key}
                     triggerData={this.triggerData}
                   />
                 ))

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Alert, StyleSheet} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import PhoneNumber from '../components/otp/PhoneNumber';
@@ -6,7 +6,6 @@ import VerifyCode from '../components/otp/VerifyCode';
 import Authenticated from '../components/otp/Authenticated';
 import FIREBASE from '../../config/FIREBASE';
 import Spinner from 'react-native-loading-spinner-overlay';
-import WarningMessage from '../components/Alert/warningMessage';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 export default function App() {
@@ -16,12 +15,40 @@ export default function App() {
   const [mobile, setMobile] = useState(null);
   const [isDate, setDate] = useState(null);
   const [name, setName] = useState(null);
+  const [oldDates, setOldDates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [showAlert2, setShowAlert2] = useState(false);
+
+  async function get_holidays() {
+    FIREBASE.database()
+      .ref('holidays')
+      .once('value')
+      .then(function (snapshot) {
+        var items = [];
+        snapshot.forEach(function (childSnapshot) {
+          var childKey = childSnapshot.key;
+          var childData = childSnapshot.val();
+          items.push(childData);
+        });
+        setOldDates(items);
+      });
+  }
+
+  useEffect(() => {
+    get_holidays();
+  }, []);
 
   async function signIn(name, phoneNumber, seats, isDate) {
-    console.log('Function signIn');
     let phoneNumberLength = phoneNumber.toString().length;
+    let duplicate = false;
+    if (isDate) {
+      oldDates.map((item, index) => {
+        if (item.holidayDate === isDate) {
+          duplicate = true;
+        }
+      });
+    }
     if (
       name &&
       seats &&
@@ -30,39 +57,42 @@ export default function App() {
       !isNaN(phoneNumber) &&
       !isNaN(seats)
     ) {
-      console.log('valid');
-      setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-      }, 10000);
-      console.log('Valid');
-      setMobile(phoneNumber);
-      setSeat(seats);
-      setDate(isDate);
-      setName(name);
-      console.log(name, phoneNumber, seats, isDate);
-      try {
-        const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-        // console.log(phoneNumber, seats);
-        setConfirm(confirmation);
-        // Alert.alert('Success', 'Order Success');
-      } catch (error) {
-        alert(error);
-        console.log(error);
+      if (!duplicate) {
+        // console.log('valid');
+        setLoading(true);
+        setTimeout(() => {
+          setLoading(false);
+        }, 10000);
+        console.log('Valid');
+        setMobile(phoneNumber);
+        setSeat(seats);
+        setDate(isDate);
+        setName(name);
+        console.log(name, phoneNumber, seats, isDate);
+        try {
+          const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+          // console.log(phoneNumber, seats);
+          setConfirm(confirmation);
+          // Alert.alert('Success', 'Order Success');
+        } catch (error) {
+          alert(error);
+          console.log(error);
+        }
+      } else {
+        // console.log('Leave day for shop');
+        Alert.alert('Leave day for shop')
       }
     } else {
       console.log('Input Here');
-      // console.log(phoneNumberLength);
+      // Alert.alert('not')
       setShowAlert(true);
-      // this.showAlert();
-      // Alert.alert('Warning!', 'Please Fill Suitable field');
     }
   }
 
-  hideAlert = () => {
+  function hideAlert() {
     setShowAlert(false);
     console.log('Alert Close');
-  };
+  }
 
   SubmitOrder = otpcode => {
     console.log('SubmitFuction');
@@ -113,28 +143,18 @@ export default function App() {
   if (loading)
     return (
       <Spinner
-        //visibility of Overlay Loading Spinner
         visible={loading}
-        //Text with the Spinner
         textContent={'Loading...'}
-        //Text style of the Spinner Text
         textStyle={{color: '#FFF'}}
       />
     );
 
+  // return <PhoneNumber onSubmit={signIn} />;
 
-  if (showAlert)
+  if (!showAlert) {
+    return <PhoneNumber onSubmit={signIn} />;
+  } else {
     return (
-      // <WarningMessage
-      //   title="Sorry!"
-      //   message="Please input suitable field"
-      //   // confirmText="Yes, Delete"
-      //   // {...this.props}
-      //   hideAlert={false}
-      //   showAlert={true}
-      //   // confirmAlert={this.hideAlert}
-      // />
-
       <AwesomeAlert
         style={styles.alert}
         show={showAlert}
@@ -149,12 +169,11 @@ export default function App() {
         confirmText="AwesomeAlert"
         cancelButtonColor="#DD6B55"
         onCancelPressed={() => {
-          this.hideAlert();
+          hideAlert();
         }}
       />
     );
-
-  return <PhoneNumber onSubmit={signIn} />;
+  }
 }
 
 const styles = StyleSheet.create({

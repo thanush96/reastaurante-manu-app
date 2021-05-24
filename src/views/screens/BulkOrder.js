@@ -1,5 +1,4 @@
 import {Picker} from '@react-native-picker/picker';
-// import {TimePicker} from 'react-native-simple-time-picker';
 import React, {Component} from 'react';
 import {
   TouchableOpacity,
@@ -37,7 +36,6 @@ export default class BulkOrder extends Component {
       successAlertMsg: false,
       loading: false,
       oldDates: [],
-
       // refreshing: false,
     };
   }
@@ -95,52 +93,55 @@ export default class BulkOrder extends Component {
           duplicate = true;
         }
       });
+    } else {
+      // this.showAlert();
+      console.log('This is Not duplicate');
     }
-    // else {
-    //   this.showAlert();
-    // }
+
     if (
       this.state.foodItem &&
       this.state.name &&
-      !duplicate &&
+      this.state.date &&
       !isNaN(this.state.parcels) &&
       this.state.parcels &&
       !isNaN(this.state.contact) &&
       phoneNumberLength === 10
     ) {
-      const AddBulkOrders = FIREBASE.database().ref('BulkOrders');
-      const BulkOrders = {
-        CustomerName: this.state.name,
-        OrderedFood: this.state.foodItem,
-        NumberOfParcels: this.state.parcels,
-        CustomerContactNo: this.state.contact,
-        GiveDate: this.state.date,
-        OrderderedDate: new Date().toDateString(),
-        status: true,
-      };
-      AddBulkOrders.push(BulkOrders)
-        .then(data => {
-          // console.log('Added');
-          this.setState({
-            loading: true,
-          });
-          setTimeout(() => {
+      if (!duplicate) {
+        const AddBulkOrders = FIREBASE.database().ref('BulkOrders');
+        const BulkOrders = {
+          CustomerName: this.state.name,
+          OrderedFood: this.state.foodItem,
+          NumberOfParcels: this.state.parcels,
+          CustomerContactNo: this.state.contact,
+          GiveDate: this.state.date,
+          OrderderedDate: new Date().toDateString(),
+          status: true,
+        };
+        AddBulkOrders.push(BulkOrders)
+          .then(data => {
             this.setState({
-              loading: false,
+              loading: true,
             });
-          }, 7000);
-          this.successShowAlert();
-          this.setState({
-            name: '',
-            contact: '',
-            foodItem: '',
-            parcels: '',
-            date: '',
+            setTimeout(() => {
+              this.setState({
+                loading: false,
+              });
+            }, 7000);
+            this.successShowAlert();
+            this.setState({
+              name: '',
+              contact: '',
+              foodItem: '',
+              parcels: '',
+              date: '',
+            });
+          })
+          .catch(error => {
+            console.log('Error :', error);
           });
-        })
-        .catch(error => {
-          console.log('Error :', error);
-        });
+      }
+      console.log('Holiday');
     } else {
       this.showAlert();
     }
@@ -221,9 +222,6 @@ export default class BulkOrder extends Component {
                   }}
                 />
                 {this.state.dataSource.map((item, index) => {
-                  {
-                    /* console.log(item.FoodStatus); */
-                  }
                   if (item.BulkFoodStatus === true)
                     return (
                       <Picker.Item
@@ -269,23 +267,8 @@ export default class BulkOrder extends Component {
                 this.setState({
                   date: date,
                 });
-                // console.log(new Date().toDateString());
               }}
             />
-
-            {/* <TimePicker
-              selectedHours={this.state.selectedHours}
-              selectedMinutes={this.state.selectedMinutes}
-              onChange={( hours, minutes) => {
-                console.log(minutes);
-                this.setState({
-                  selectedHours: hours,
-                  selectedMinutes: minutes,
-                });
-                
-              }}
-            /> */}
-
             <TextInput
               style={styles.textInput}
               placeholder="Number Of Parcels"
@@ -328,34 +311,23 @@ export default class BulkOrder extends Component {
           </ScrollView>
         </View>
 
-        {/* WARNING MESSAGE ALERT */}
         <WarningMessage
           title="Sorry!"
           message="Please input suitable field"
-          // confirmText="Yes, Delete"
-          // {...this.props}
           hideAlert={this.hideAlert}
           showAlert={showAlert}
-          // confirmAlert={this.hideAlert}
         />
 
-        {/* SUCCESS MESSAGE ALERT */}
         <WarningMessage
           title="Thank You!"
           message="Your submission is received and we will contact you soon"
-          // confirmText="Yes, Delete"
-          // {...this.props}
           hideAlert={this.hideAlertSuccessMsg}
           showAlert={successAlertMsg}
-          // confirmAlert={this.hideAlert}
         />
 
         <Spinner
-          //visibility of Overlay Loading Spinner
           visible={this.state.loading}
-          //Text with the Spinner
           textContent={'Loading...'}
-          //Text style of the Spinner Text
           textStyle={styles.spinnerTextStyle}
         />
       </SafeAreaView>
@@ -374,7 +346,6 @@ const styles = StyleSheet.create({
   pages: {
     flex: 1,
     padding: 30,
-    // backgroundColor:'green'
   },
   title: {
     fontSize: 30,
@@ -385,8 +356,6 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    // borderWidth: 1,
-    // borderColor: 'grey',
     backgroundColor: 'grey',
     color: 'black',
     borderRadius: 50,
@@ -402,8 +371,6 @@ const styles = StyleSheet.create({
     padding: 10,
     color: 'black',
     backgroundColor: 'grey',
-
-    // textAlign: 'center',
   },
 
   touch: {
