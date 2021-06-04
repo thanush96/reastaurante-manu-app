@@ -2,11 +2,10 @@ import React from 'react';
 import 'react-native-gesture-handler';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import COLORS from '../../const/colors';
-import OnBoardScreen from '../screens/OnBoardScreen';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import HomeScreen from '../screens/HomeScreen';
 import BulkOrder from '../screens/BulkOrder';
-import SeatReservation from '../screens/SeatReservation';
+import SeatReservation from '../screens/auth';
 
 const Tab = createBottomTabNavigator();
 
@@ -15,12 +14,10 @@ const BottomNavigator = () => {
     <Tab.Navigator
       tabBarOptions={{
         style: {
-          borderTopLeftRadius:15,
-          borderTopRightRadius:15,
+          borderTopLeftRadius: 15,
+          borderTopRightRadius: 15,
           height: 50,
           borderTopWidth: 0,
-          // marginHorizontal:40,
-          // marginBottom:10,
           elevation: 0,
           backgroundColor: COLORS.secondary,
         },
@@ -29,11 +26,10 @@ const BottomNavigator = () => {
       }}>
       <Tab.Screen
         name="Home"
-        
         component={HomeScreen}
         options={{
           tabBarIcon: ({color}) => (
-            <Icon name="home-filled" color={color} size={28} />
+            <Icon name="food-bank" color={color} size={28} />
           ),
         }}
       />
@@ -53,7 +49,7 @@ const BottomNavigator = () => {
         component={SeatReservation}
         options={{
           tabBarIcon: ({color}) => (
-            <Icon name="book" color={color} size={28} />
+            <Icon name="event-seat" color={color} size={28} />
           ),
         }}
       />

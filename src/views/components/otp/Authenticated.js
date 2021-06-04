@@ -13,7 +13,6 @@ import COLORS from '../../../const/colors';
 export default function Authenticated() {
   return (
     <View style={styles.screen} keyboardShouldPersistTaps="handled">
-      {/* <Text style={styles.phoneNumber}>{auth().currentUser.phoneNumber}</Text> */}
 
       <Image
         source={require('../../../assets/success.gif')}

@@ -28,6 +28,11 @@ const CardContact = ({id, contactItem, navigation, removeData}) => {
         <Text style={styles.name}>{contactItem.name}</Text>
         <Text style={styles.price}>Rs {contactItem.unitPrice}.00</Text>
         <Text style={styles.description}>{contactItem.description}</Text>
+        {/* <Text style={styles.description}>{contactItem.category}</Text>
+        <Text style={styles.description}>{contactItem.category2}</Text>
+        <Text style={styles.description}>{contactItem.category3}</Text>
+        <Text style={styles.description}>{contactItem.category4}</Text>
+        <Text style={styles.description}>{contactItem.category5}</Text> */}
       </View>
 
       {/* <View style={styles.icon}>

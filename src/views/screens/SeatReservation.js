@@ -1,12 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import {Alert, StyleSheet} from 'react-native';
+import {Alert, StyleSheet, View, Text} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import PhoneNumber from '../components/otp/PhoneNumber';
 import VerifyCode from '../components/otp/VerifyCode';
 import Authenticated from '../components/otp/Authenticated';
 import FIREBASE from '../../config/FIREBASE';
 import Spinner from 'react-native-loading-spinner-overlay';
-import AwesomeAlert from 'react-native-awesome-alerts';
 
 export default function App() {
   const [confirm, setConfirm] = useState(null);
@@ -17,8 +16,6 @@ export default function App() {
   const [name, setName] = useState(null);
   const [oldDates, setOldDates] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-  const [showAlert2, setShowAlert2] = useState(false);
 
   async function get_holidays() {
     FIREBASE.database()
@@ -58,44 +55,43 @@ export default function App() {
       !isNaN(seats)
     ) {
       if (!duplicate) {
-        // console.log('valid');
         setLoading(true);
         setTimeout(() => {
           setLoading(false);
         }, 10000);
-        console.log('Valid');
         setMobile(phoneNumber);
         setSeat(seats);
         setDate(isDate);
         setName(name);
-        console.log(name, phoneNumber, seats, isDate);
         try {
           const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-          // console.log(phoneNumber, seats);
           setConfirm(confirmation);
-          // Alert.alert('Success', 'Order Success');
         } catch (error) {
-          alert(error);
+          Alert.alert(
+            'Sorry',
+            'Your Mobile number is wrong please make sure number',
+          );
           console.log(error);
         }
       } else {
-        // console.log('Leave day for shop');
-        Alert.alert('Leave day for shop')
+        Alert.alert('Sorry !', 'This date has leave for shop', [
+          {
+            text: 'ok',
+            style: 'cancel',
+          },
+        ]);
       }
     } else {
-      console.log('Input Here');
-      // Alert.alert('not')
-      setShowAlert(true);
+      Alert.alert('Sorry !', 'Plsea fill sutable fields', [
+        {
+          text: 'ok',
+          style: 'cancel',
+        },
+      ]);
     }
   }
 
-  function hideAlert() {
-    setShowAlert(false);
-    console.log('Alert Close');
-  }
-
   SubmitOrder = otpcode => {
-    console.log('SubmitFuction');
     const AddSatReservation = FIREBASE.database().ref('Seat_Reservation');
     const Reservation = {
       CustomerName: name,
@@ -107,24 +103,29 @@ export default function App() {
       OrderderedDate: new Date().toDateString(),
     };
     AddSatReservation.push(Reservation)
-      .then(data => {
-        console.log('Order Success');
-      })
+      .then(data => {})
       .catch(error => {
         console.log('Error :', error);
       });
   };
 
   async function confirmVerificationCode(code) {
-    console.log('confirmVerificationCode');
     try {
       await confirm.confirm(code);
       SubmitOrder(code);
-      console.log(seat, mobile, code, isDate, new Date().toDateString());
       setConfirm(null);
     } catch (error) {
       console.log(error);
-      alert('Invalid code');
+      Alert.alert(
+        'Sorry !',
+        'You OTP Wrong Please make sure 6 Digits OTP on your SMS',
+        [
+          {
+            text: 'ok',
+            style: 'cancel',
+          },
+        ],
+      );
     }
   }
 
@@ -149,31 +150,7 @@ export default function App() {
       />
     );
 
-  // return <PhoneNumber onSubmit={signIn} />;
-
-  if (!showAlert) {
-    return <PhoneNumber onSubmit={signIn} />;
-  } else {
-    return (
-      <AwesomeAlert
-        style={styles.alert}
-        show={showAlert}
-        showProgress={false}
-        title="Sorry!"
-        message="Please input suitable field"
-        closeOnTouchOutside={true}
-        closeOnHardwareBackPress={false}
-        showCancelButton={true}
-        showConfirmButton={false}
-        cancelText="Ok"
-        confirmText="AwesomeAlert"
-        cancelButtonColor="#DD6B55"
-        onCancelPressed={() => {
-          hideAlert();
-        }}
-      />
-    );
-  }
+  return <PhoneNumber onSubmit={signIn} />;
 }
 
 const styles = StyleSheet.create({

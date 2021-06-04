@@ -8,6 +8,7 @@ import {
   ScrollView,
   SafeAreaView,
   RefreshControl,
+  Dimensions,
 } from 'react-native';
 import FIREBASE from '../../config/FIREBASE';
 import {CardContact, CategoryCard} from '../../maincomponents';
@@ -26,6 +27,10 @@ export default class Home extends Component {
       category: {},
       categoryKey: [],
       refreshing: false,
+      categoryCheesed: false,
+      choosedCategortName: '',
+      categoryArray: [],
+      allFoods: true,
     };
   }
 
@@ -36,23 +41,32 @@ export default class Home extends Component {
 
   triggerData = category => {
     let foodCategory = category;
-    FIREBASE.database()
-      .ref('contact')
-      .orderByChild('category')
-      .equalTo(foodCategory)
-      .once('value', querySnapShot => {
-        let data = querySnapShot.val() ? querySnapShot.val() : {};
-        let contactItem = {...data};
-
-        this.setState({
-          contact: contactItem,
-          contactKey: Object.keys(contactItem),
-          refreshing: false,
-        });
-      });
+    // console.log('trigger');
+    this.setState({
+      categoryCheesed: true,
+      allFoods: false,
+      choosedCategortName: foodCategory,
+    });
+    // let foodCategory = category;
+    // let conn = FIREBASE.database().ref('contact');
+    // let query = conn.orderByChild('category').equalTo(foodCategory);
+    // query.once('value', querySnapShot => {
+    //   console.log('Exe');
+    //   let data = querySnapShot.val() ? querySnapShot.val() : {};
+    //   let contactItem = {...data};
+    //   this.setState({
+    //     contact: contactItem,
+    //     contactKey: Object.keys(contactItem),
+    //     refreshing: false,
+    //   });
+    // });
   };
 
   MountData() {
+    this.setState({
+      categoryCheesed: false,
+      allFoods: true,
+    });
     // FIREBASE.database()
     //   .ref('contact')
     //   .orderByChild('category')
@@ -71,11 +85,14 @@ export default class Home extends Component {
           contact: contactItem,
           contactKey: Object.keys(contactItem),
           refreshing: false,
+          categoryArray: contactItem.category,
         });
       });
   }
 
   MountCategory() {
+    // console.log(this.state.contactKey);
+
     FIREBASE.database()
       .ref('categories')
       .once('value', querySnapShot => {
@@ -100,7 +117,13 @@ export default class Home extends Component {
     return (
       <View style={styles.conatiner}>
         <View style={styles.mainheader}>
-          <Text style={styles.headertitle}>Menu</Text>
+          {this.state.allFoods ? (
+            <Text style={styles.headertitle}>All Food For You</Text>
+          ) : (
+            <Text style={styles.headertitle}>
+              {this.state.choosedCategortName} For You
+            </Text>
+          )}
         </View>
 
         <View style={styles.categorieItems}>
@@ -132,9 +155,46 @@ export default class Home extends Component {
             />
           }>
           <View style={styles.page}>
-            {contactKey.length > 0 ? (
+            {this.state.categoryCheesed == false ? (
+              contactKey.length > 0 ? (
+                contactKey.map(key =>
+                  contact[key].MenuFoodStatus == true ? (
+                    <CardContact
+                      key={key}
+                      contactItem={contact[key]}
+                      id={key}
+                      {...this.props}
+                      removeData={this.removeData}
+                    />
+                  ) : null,
+                )
+              ) : (
+                <View
+                  style={{
+                    height: Dimensions.get('window').width,
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: COLORS.secondary,
+                      fontWeight: 'bold',
+                    }}>
+                    Sorry! No Foods Available
+                  </Text>
+                </View>
+              )
+            ) : contactKey.length > 0 ? (
               contactKey.map(key =>
-                contact[key].MenuFoodStatus == true ? (
+                (contact[key].MenuFoodStatus == true &&
+                  contact[key].category[0] == this.state.choosedCategortName) ||
+                contact[key].category[1] == this.state.choosedCategortName ||
+                contact[key].category[2] == this.state.choosedCategortName ||
+                contact[key].category[3] == this.state.choosedCategortName ||
+                contact[key].category[4] == this.state.choosedCategortName ||
+                contact[key].category[5] == this.state.choosedCategortName ||
+                contact[key].category[6] == this.state.choosedCategortName ? (
                   <CardContact
                     key={key}
                     contactItem={contact[key]}
@@ -145,7 +205,21 @@ export default class Home extends Component {
                 ) : null,
               )
             ) : (
-              <Text> No Foods Available</Text>
+              <View
+                style={{
+                  height: Dimensions.get('window').width,
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: COLORS.secondary,
+                    fontWeight: 'bold',
+                  }}>
+                  Sorry! No Foods Available
+                </Text>
+              </View>
             )}
           </View>
         </ScrollView>
@@ -166,7 +240,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: COLORS.white,
+    color: COLORS.light,
     top: 50,
   },
 

@@ -15,9 +15,11 @@ import {
 import COLORS from '../../const/colors';
 import InputData from '../../maincomponents/InputBox';
 import FIREBASE from '../../config/FIREBASE';
+import auth from '@react-native-firebase/auth';
 import DatePicker from 'react-native-datepicker';
-import WarningMessage from '../components/Alert/warningMessage';
+import PhoneInput from 'react-native-phone-number-input';
 import Spinner from 'react-native-loading-spinner-overlay';
+import WarningMessage from '../components/Alert/warningMessage';
 
 export default class BulkOrder extends Component {
   constructor(props) {
@@ -32,10 +34,17 @@ export default class BulkOrder extends Component {
       dataSource: [],
       selectedHours: 0,
       selectedMinutes: 0,
-      showAlert: false,
-      successAlertMsg: false,
       loading: false,
       oldDates: [],
+      holidayVal: false,
+      mobileVal: false,
+      nameVal: false,
+      parcelVal: false,
+      dateVal: false,
+      ItemVal: false,
+      succeessMsg: false,
+      confirmResult: null,
+
       // refreshing: false,
     };
   }
@@ -80,12 +89,11 @@ export default class BulkOrder extends Component {
     this.setState({
       dataSource: await this.get_firebase_list(),
       oldDates: await this.get_holidays(),
-      // refreshing: false,
     });
   }
 
-  onSubmit = () => {
-    let phoneNumberLength = this.state.contact.length;
+  handleSendCode = () => {
+    // let phoneNumberLength = this.state.contact.length;
     let duplicate = false;
     if (this.state.date) {
       this.state.oldDates.map((item, index) => {
@@ -93,58 +101,91 @@ export default class BulkOrder extends Component {
           duplicate = true;
         }
       });
-    } else {
-      // this.showAlert();
-      console.log('This is Not duplicate');
     }
 
-    if (
-      this.state.foodItem &&
-      this.state.name &&
-      this.state.date &&
-      !isNaN(this.state.parcels) &&
-      this.state.parcels &&
-      !isNaN(this.state.contact) &&
-      phoneNumberLength === 10
-    ) {
-      if (!duplicate) {
-        const AddBulkOrders = FIREBASE.database().ref('BulkOrders');
-        const BulkOrders = {
-          CustomerName: this.state.name,
-          OrderedFood: this.state.foodItem,
-          NumberOfParcels: this.state.parcels,
-          CustomerContactNo: this.state.contact,
-          GiveDate: this.state.date,
-          OrderderedDate: new Date().toDateString(),
-          status: true,
-        };
-        AddBulkOrders.push(BulkOrders)
-          .then(data => {
-            this.setState({
-              loading: true,
-            });
-            setTimeout(() => {
-              this.setState({
-                loading: false,
-              });
-            }, 7000);
-            this.successShowAlert();
-            this.setState({
-              name: '',
-              contact: '',
-              foodItem: '',
-              parcels: '',
-              date: '',
-            });
-          })
-          .catch(error => {
-            console.log('Error :', error);
-          });
+    if (this.state.foodItem) {
+      if (this.state.date) {
+        if (this.state.parcels && !isNaN(this.state.parcels)) {
+          if (this.state.name) {
+            // if (!isNaN(this.state.contact) && phoneNumberLength === 10) {
+            if (!duplicate) {
+              if (this.validatePhoneNumber()) {
+                this.setState({
+                  loading: true,
+                });
+                setTimeout(() => {
+                  this.setState({
+                    loading: false,
+                  });
+                }, 20000);
+                auth()
+                  .signInWithPhoneNumber(this.state.contact)
+                  .then(confirmResult => {
+                    this.setState({confirmResult});
+                    console.log('Success');
+                  })
+                  .catch(error => {
+                    // this.showWrongPhone();
+                    alert('Wrong phone number Ot connection problem');
+                    console.log(error);
+                  });
+              } else {
+                alert('Wrong phone number');
+              }
+            } else {
+              this.showHolidayVAl();
+            }
+            // } else {
+            //   this.showMobileVal();
+            // }
+          } else {
+            this.showNameVAl();
+          }
+        } else {
+          this.showParcelVAl();
+        }
+      } else {
+        this.showDateVAl();
       }
-      console.log('Holiday');
     } else {
-      this.showAlert();
+      this.showItemVAl();
     }
+  };
+
+  SubmitOrder = () => {
+    const AddBulkOrders = FIREBASE.database().ref('BulkOrders');
+    const BulkOrders = {
+      CustomerName: this.state.name,
+      OrderedFood: this.state.foodItem,
+      NumberOfParcels: this.state.parcels,
+      CustomerContactNo: this.state.contact,
+      GiveDate: this.state.date,
+      OrderderedDate: new Date().toDateString(),
+      status: true,
+      reject: false,
+    };
+    AddBulkOrders.push(BulkOrders)
+      .then(data => {
+        this.setState({
+          loading: true,
+        });
+        setTimeout(() => {
+          this.setState({
+            loading: false,
+          });
+          this.showSuccessVAl();
+          this.setState({
+            name: '',
+            contact: '',
+            foodItem: '',
+            parcels: '',
+            date: '',
+          });
+        }, 5000);
+      })
+      .catch(error => {
+        console.log('Error :', error);
+      });
   };
 
   clear = () => {
@@ -154,40 +195,172 @@ export default class BulkOrder extends Component {
       foodItem: '',
       parcels: '',
       date: '',
+      confirmResult: null,
     });
     this.componentWillMount();
   };
 
-  // ALERT FUNCTIONS
-  showAlert = () => {
+  // Name VALIDATION
+  showHolidayVAl = () => {
     this.setState({
-      showAlert: true,
+      holidayVal: true,
     });
   };
 
-  hideAlert = () => {
+  hideHolidayVal = () => {
     this.setState({
-      showAlert: false,
+      holidayVal: false,
     });
   };
 
-  // SUCCESSFULL ALERT FUNCTIONS
-  successShowAlert = () => {
+  // Name VALIDATION
+  showMobileVal = () => {
     this.setState({
-      successAlertMsg: true,
+      mobileVal: true,
     });
   };
 
-  hideAlertSuccessMsg = () => {
+  hideMobileVal = () => {
     this.setState({
-      successAlertMsg: false,
+      mobileVal: false,
     });
+  };
+
+  // Name VALIDATION
+  showNameVAl = () => {
+    this.setState({
+      nameVal: true,
+    });
+  };
+
+  hideNameVal = () => {
+    this.setState({
+      nameVal: false,
+    });
+  };
+
+  // Name VALIDATION
+  showParcelVAl = () => {
+    this.setState({
+      parcelVal: true,
+    });
+  };
+
+  hideParcelVal = () => {
+    this.setState({
+      parcelVal: false,
+    });
+  };
+
+  // Name VALIDATION
+  showDateVAl = () => {
+    this.setState({
+      dateVal: true,
+    });
+  };
+
+  hideDateVal = () => {
+    this.setState({
+      dateVal: false,
+    });
+  };
+
+  // Name VALIDATION
+  showItemVAl = () => {
+    this.setState({
+      ItemVal: true,
+    });
+  };
+
+  hideItemVal = () => {
+    this.setState({
+      ItemVal: false,
+    });
+  };
+
+  // Name VALIDATION
+  showSuccessVAl = () => {
+    this.setState({
+      succeessMsg: true,
+    });
+  };
+
+  hideSuccessVal = () => {
+    this.setState({
+      succeessMsg: false,
+    });
+  };
+
+  // NUMBER VALIDATION
+  validatePhoneNumber = () => {
+    var regexp = /^\+[0-9]?()[0-9](\s|\S)(\d[0-9]{8,16})$/;
+    return regexp.test(this.state.contact);
+  };
+
+  // CHANGE PHONE NUMBER
+  changePhoneNumber = () => {
+    this.setState({confirmResult: null, verificationCode: ''});
+  };
+
+  // VERIFY CODE
+  handleVerifyCode = () => {
+    console.log('handleVerifyCode');
+    const {confirmResult, verificationCode} = this.state;
+    if (verificationCode.length == 6) {
+      confirmResult
+        .confirm(verificationCode)
+        .then(user => {
+          console.log('Success Order', auth().currentUser.phoneNumber);
+          this.SubmitOrder();
+        })
+        .catch(error => {
+          console.log('Not Order');
+          alert('invalit otp');
+          // this.showInvalidOtp();
+        });
+    } else {
+      // this.showOtpVAl();
+      alert('Input 6 otp');
+    }
+  };
+
+  renderConfirmationCodeView = () => {
+    return (
+      <View>
+        <TextInput
+          style={styles.input}
+          placeholder="Verification code"
+          placeholderTextColor="#C7C7CD"
+          value={this.state.verificationCode}
+          keyboardType="numeric"
+          onChangeText={verificationCode => {
+            this.setState({verificationCode});
+          }}
+          maxLength={6}
+        />
+        {/* <TouchableOpacity style={styles.touch} onPress={() => this.onSubmit()}>
+          <Text style={styles.submit}>Book Now</Text>
+        </TouchableOpacity> */}
+
+        <TouchableOpacity style={styles.touch} onPress={this.handleVerifyCode}>
+          <Text style={styles.submit}>Order Now</Text>
+        </TouchableOpacity>
+      </View>
+    );
   };
 
   render() {
     var today = new Date();
     today.setDate(today.getDate() + 3);
-    const {showAlert, successAlertMsg} = this.state;
+    const {
+      holidayVal,
+      mobileVal,
+      nameVal,
+      parcelVal,
+      dateVal,
+      ItemVal,
+      succeessMsg,
+    } = this.state;
 
     return (
       <SafeAreaView style={styles.conatiner}>
@@ -198,14 +371,7 @@ export default class BulkOrder extends Component {
         <View style={styles.pages}>
           <ScrollView
             showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            // refreshControl={
-            //   <RefreshControl
-            //     refreshing={this.state.refreshing}
-            //     onRefresh={this._onRefresh}
-            //   />
-            // }
-          >
+            keyboardShouldPersistTaps="handled">
             <View style={styles.card}>
               <Picker
                 onValueChange={(itemVlue, itemIndex) =>
@@ -218,7 +384,7 @@ export default class BulkOrder extends Component {
                   value=""
                   style={{
                     color: '#D3D3D3',
-                    fontSize: 14,
+                    fontSize: 13,
                   }}
                 />
                 {this.state.dataSource.map((item, index) => {
@@ -286,21 +452,44 @@ export default class BulkOrder extends Component {
               nameState="name"
             />
 
-            <TextInput
-              style={styles.textInput}
-              placeholderTextColor="#C7C7CD"
-              placeholder="Enter Your Contact number here"
-              onChangeText={text => this.setState({contact: text})}
-              value={this.state.contact}
-              keyboardType="numeric"
-              maxLength={10}
+            <PhoneInput
+              defaultValue={this.state.contact}
+              defaultCode="LK"
+              layout="first"
+              onChangeFormattedText={phone => {
+                this.setState({contact: phone});
+              }}
+              containerStyle={{
+                backgroundColor: 'grey',
+                borderRadius: 50,
+                width: 300,
+                height: 45,
+                marginTop: 10,
+                marginBottom: 5,
+              }}
+              textContainerStyle={{backgroundColor: 'grey', borderRadius: 50}}
+              textInputProps={{
+                maxLength: 10,
+                fontSize: 14,
+                padding: 0,
+              }}
             />
 
             <TouchableOpacity
               style={styles.touch}
-              onPress={() => this.onSubmit()}>
-              <Text style={styles.submit}>Order Now</Text>
+              onPress={
+                this.state.confirmResult
+                  ? this.changePhoneNumber
+                  : this.handleSendCode
+              }>
+              <Text style={styles.submit}>
+                {this.state.confirmResult ? 'Change Phone Number' : 'Send'}
+              </Text>
             </TouchableOpacity>
+
+            {this.state.confirmResult
+              ? this.renderConfirmationCodeView()
+              : null}
 
             <TouchableOpacity
               style={styles.clear}
@@ -310,25 +499,66 @@ export default class BulkOrder extends Component {
             </TouchableOpacity>
           </ScrollView>
         </View>
-
-        <WarningMessage
-          title="Sorry!"
-          message="Please input suitable field"
-          hideAlert={this.hideAlert}
-          showAlert={showAlert}
-        />
-
-        <WarningMessage
-          title="Thank You!"
-          message="Your submission is received and we will contact you soon"
-          hideAlert={this.hideAlertSuccessMsg}
-          showAlert={successAlertMsg}
-        />
-
         <Spinner
           visible={this.state.loading}
           textContent={'Loading...'}
           textStyle={styles.spinnerTextStyle}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Your Reservation date is Holiday for shop, Please choose other dates"
+          hideAlert={this.hideHolidayVal}
+          showAlert={holidayVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Input Mobile Number"
+          hideAlert={this.hideMobileVal}
+          showAlert={mobileVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Choose Date"
+          hideAlert={this.hideDateVal}
+          showAlert={dateVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Input Your Name"
+          hideAlert={this.hideNameVal}
+          showAlert={nameVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Input Number Of Parcels"
+          hideAlert={this.hideParcelVal}
+          showAlert={parcelVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Choose Date"
+          hideAlert={this.hideDateVal}
+          showAlert={dateVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Choose Food Item"
+          hideAlert={this.hideItemVal}
+          showAlert={ItemVal}
+        />
+
+        <WarningMessage
+          title="Success!"
+          message="Your Order has been send, We will contact as soon"
+          hideAlert={this.hideSuccessVal}
+          showAlert={succeessMsg}
         />
       </SafeAreaView>
     );
@@ -373,11 +603,23 @@ const styles = StyleSheet.create({
     backgroundColor: 'grey',
   },
 
+  input: {
+    borderRadius: 50,
+    width: 300,
+    height: 45,
+    marginVertical: 7,
+    fontSize: 14,
+    padding: 10,
+    color: 'black',
+    backgroundColor: 'grey',
+    // textAlign:'center'
+  },
   touch: {
     backgroundColor: COLORS.secondary,
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
+    marginBottom: 10,
     borderRadius: 50,
   },
 

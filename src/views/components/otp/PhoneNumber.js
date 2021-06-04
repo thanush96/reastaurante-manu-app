@@ -19,6 +19,7 @@ export default function PhoneNumber(props) {
   const [isDate, setDate] = useState(null);
   const [formattedValue, setFormattedValue] = useState('');
 
+  console.log('Reservation screen');
 
   var today = new Date();
   return (

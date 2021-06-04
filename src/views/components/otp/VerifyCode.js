@@ -7,7 +7,7 @@ import {
   Button,
   TextInput,
   Image,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
 import COLORS from '../../../const/colors';
 
@@ -22,7 +22,7 @@ export default function OTP(props) {
       <View style={styles.screen}>
         <Image
           source={require('../../../assets/lock.png')}
-          style={{width: 100, height: 100,marginBottom:20}}
+          style={{width: 100, height: 100, marginBottom: 20}}
         />
         {/* <Text style={styles.text}>Enter OTP</Text> */}
         <TextInput
@@ -40,8 +40,6 @@ export default function OTP(props) {
           keyboardShouldPersistTaps={'always'}>
           <Text style={styles.submit}>Confirm OTP</Text>
         </TouchableOpacity>
-
-        {/* <Button title="Confirm OTP" onPress={() => props.onSubmit(code)} /> */}
       </View>
     </SafeAreaView>
   );
@@ -66,7 +64,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     top: 30,
-
   },
   input: {
     backgroundColor: '#D3D3D3',
@@ -77,7 +74,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     letterSpacing: 30,
-    marginBottom:20
+    marginBottom: 20,
   },
   text: {
     fontSize: 25,
